@@ -12,6 +12,7 @@ const cases = [
     result: "Reduced inventory discrepancy from 23% to 1.4% in 90 days",
     metrics: ["47 store locations", "8-week delivery", "3 custom integrations"],
     stack: "Next.js · PostgreSQL · AWS",
+    image: caseImg1,
   },
   {
     type: "POS System",
@@ -20,6 +21,7 @@ const cases = [
     result: "Eliminated $14,000/year in third-party POS subscription fees",
     metrics: ["12 outlets", "5-week delivery", "Offline-first architecture"],
     stack: "React · Node.js · SQLite",
+    image: caseImg2,
   },
   {
     type: "Commercial SaaS",
@@ -28,6 +30,7 @@ const cases = [
     result: "Launched MVP in 6 weeks. Reached $40K MRR in 4 months.",
     metrics: ["3 pricing tiers", "Multi-tenant", "Stripe billing"],
     stack: "Next.js · FastAPI · Stripe · AWS",
+    image: caseImg3,
   },
 ];
 
