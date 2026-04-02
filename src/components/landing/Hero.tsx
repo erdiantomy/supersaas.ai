@@ -39,7 +39,7 @@ export function Hero() {
       <motion.div
         animate={{ scale: [1, 1.3, 1], opacity: [0.15, 0.3, 0.15] }}
         transition={{ duration: 15, repeat: Infinity, ease: "easeInOut", delay: 3 }}
-        className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-blue-500/15 rounded-full blur-[150px]"
+        className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-[hsl(var(--ring))]/15 rounded-full blur-[150px]"
       />
 
       <div className="dot-grid absolute inset-0 opacity-40" />
