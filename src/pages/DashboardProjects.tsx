@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
@@ -8,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Eye } from "lucide-react";
 import type { Tables } from "@/integrations/supabase/types";
 
 type Project = Tables<"projects"> & { clients?: { name: string } | null };
@@ -22,6 +23,7 @@ const statusColors: Record<string, string> = {
 };
 
 export default function DashboardProjects() {
+  const navigate = useNavigate();
   const [projects, setProjects] = useState<Project[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
   const [open, setOpen] = useState(false);
@@ -82,9 +84,9 @@ export default function DashboardProjects() {
       <div className="grid gap-4">
         {projects.length === 0 && <p className="text-muted-foreground">No projects yet.</p>}
         {projects.map((p) => (
-          <Card key={p.id} className="glass-card">
+          <Card key={p.id} className="glass-card hover:border-primary/20 transition-colors">
             <CardContent className="flex items-center justify-between py-4 px-6">
-              <div>
+              <div className="flex-1 min-w-0">
                 <p className="font-semibold">{p.title}</p>
                 <p className="text-sm text-muted-foreground">{p.clients?.name ?? "No client"} {p.description && `· ${p.description}`}</p>
               </div>
@@ -100,6 +102,13 @@ export default function DashboardProjects() {
                     <SelectItem value="completed">Completed</SelectItem>
                   </SelectContent>
                 </Select>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => navigate(`/dashboard/project/${p.id}`)}
+                >
+                  <Eye className="h-4 w-4" />
+                </Button>
               </div>
             </CardContent>
           </Card>
