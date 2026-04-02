@@ -1,3 +1,4 @@
+import { motion } from "framer-motion";
 import { Check, X } from "lucide-react";
 
 const rows = [
@@ -10,20 +11,35 @@ const rows = [
   { feature: "Delivery", generic: "Instant (misconfigured)", custom: "6–12 weeks (exact fit)" },
 ];
 
+const fade = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0 } };
+
 export function ComparisonTable() {
   return (
     <section className="section-padding bg-card/40">
       <div className="container-narrow">
-        <div className="text-center mb-16">
+        <motion.div
+          variants={fade}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-16"
+        >
           <h2 className="text-3xl md:text-5xl font-display font-bold mb-6">
             Generic SaaS vs Super SaaS
           </h2>
           <p className="text-lg text-muted-foreground">
             Why renting software costs more than building it.
           </p>
-        </div>
+        </motion.div>
 
-        <div className="overflow-x-auto">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-60px" }}
+          transition={{ duration: 0.6, delay: 0.15 }}
+          className="overflow-x-auto"
+        >
           <table className="w-full text-left border-collapse">
             <thead>
               <tr>
@@ -36,7 +52,14 @@ export function ComparisonTable() {
             </thead>
             <tbody>
               {rows.map((row, i) => (
-                <tr key={i} className="border-b border-border/50 hover:bg-secondary/30 transition-colors">
+                <motion.tr
+                  key={i}
+                  initial={{ opacity: 0, x: -10 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.35, delay: 0.2 + i * 0.06 }}
+                  className="border-b border-border/50 hover:bg-secondary/30 transition-colors"
+                >
                   <td className="p-4 text-secondary-foreground text-sm">{row.feature}</td>
                   <td className="p-4 text-muted-foreground text-sm">
                     {typeof row.generic === "boolean" ? (
@@ -58,11 +81,11 @@ export function ComparisonTable() {
                       </span>
                     )}
                   </td>
-                </tr>
+                </motion.tr>
               ))}
             </tbody>
           </table>
-        </div>
+        </motion.div>
       </div>
     </section>
   );

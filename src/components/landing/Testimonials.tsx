@@ -31,12 +31,24 @@ export function Testimonials() {
   return (
     <section className="section-padding bg-card/40">
       <div className="container-narrow relative z-10">
-        <div className="text-center mb-14">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-14"
+        >
           <h2 className="text-3xl md:text-5xl font-display font-bold mb-4">Client Stories</h2>
           <p className="text-lg text-muted-foreground">Don't just take our word for it.</p>
-        </div>
+        </motion.div>
 
-        <div className="glass-card p-8 md:p-12 rounded-3xl relative">
+        <motion.div
+          initial={{ opacity: 0, y: 20, scale: 0.97 }}
+          whileInView={{ opacity: 1, y: 0, scale: 1 }}
+          viewport={{ once: true, margin: "-60px" }}
+          transition={{ duration: 0.6, delay: 0.15 }}
+          className="glass-card p-8 md:p-12 rounded-3xl relative"
+        >
           <Quote className="absolute top-8 left-8 text-primary/10 w-20 h-20" />
 
           <div className="relative z-10 min-h-[200px] flex flex-col justify-center">
@@ -80,7 +92,7 @@ export function Testimonials() {
               </button>
             </div>
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );

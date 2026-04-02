@@ -48,23 +48,36 @@ const plans = [
   },
 ];
 
+const fade = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0 } };
+
 export function Pricing() {
   return (
     <section id="pricing" className="section-padding">
       <div className="container-wide">
-        <div className="text-center mb-16">
+        <motion.div
+          variants={fade}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-16"
+        >
           <h2 className="text-3xl md:text-5xl font-display font-bold mb-6">
             Transparent Pricing
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Fixed-price. No hourly billing. No surprises. You pay once and own it forever.
           </p>
-        </div>
+        </motion.div>
 
         <div className="grid md:grid-cols-3 gap-6 items-stretch">
           {plans.map((plan, i) => (
             <motion.div
               key={i}
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-60px" }}
+              transition={{ duration: 0.5, delay: i * 0.12 }}
               whileHover={{ y: -6 }}
               className={`rounded-2xl p-8 flex flex-col h-full transition-all duration-300 ${
                 plan.featured
