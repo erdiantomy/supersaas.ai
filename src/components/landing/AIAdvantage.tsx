@@ -19,20 +19,25 @@ const cards = [
   },
 ];
 
-const fade = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0 } };
+const cinematic = {
+  hidden: { opacity: 0, y: 50, scale: 0.96 },
+  visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } },
+};
 
 export function AIAdvantage() {
   return (
-    <section className="section-padding">
-      <div className="container-wide">
+    <section className="section-padding relative overflow-hidden">
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,hsl(152_100%_45%/_0.04),transparent_60%)]" />
+
+      <div className="container-wide relative z-10">
         <motion.div
-          variants={fade}
+          variants={cinematic}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
+          <span className="reveal-line" />
           <h2 className="text-3xl md:text-5xl font-display font-bold mb-6">
             The AI Advantage
           </h2>
@@ -46,21 +51,21 @@ export function AIAdvantage() {
           {cards.map((c, i) => (
             <motion.div
               key={i}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, y: 50, scale: 0.93 }}
+              whileInView={{ opacity: 1, y: 0, scale: 1 }}
               viewport={{ once: true, margin: "-60px" }}
-              transition={{ duration: 0.5, delay: i * 0.12 }}
-              whileHover={{ y: -6 }}
-              className="glass-card p-8 rounded-2xl transition-all duration-300 hover:border-primary/30 hover:shadow-[var(--glow-green)]"
+              transition={{ duration: 0.7, delay: i * 0.15, ease: [0.16, 1, 0.3, 1] }}
+              whileHover={{ y: -8, scale: 1.02, transition: { duration: 0.3 } }}
+              className="glass-card p-8 rounded-2xl transition-all duration-500 hover:border-primary/30 hover:shadow-[0_0_60px_hsl(152_100%_45%/_0.12)] group"
             >
               <motion.div
-                initial={{ scale: 0.5, opacity: 0 }}
-                whileInView={{ scale: 1, opacity: 1 }}
+                initial={{ scale: 0.3, opacity: 0, rotate: -20 }}
+                whileInView={{ scale: 1, opacity: 1, rotate: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: i * 0.12 + 0.15, type: "spring", stiffness: 200, damping: 15 }}
-                className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-6 text-primary"
+                transition={{ duration: 0.6, delay: i * 0.15 + 0.2, type: "spring", stiffness: 200, damping: 15 }}
+                className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center mb-6 text-primary group-hover:bg-primary/20 transition-colors duration-500 glow-icon"
               >
-                <c.icon size={24} />
+                <c.icon size={26} />
               </motion.div>
               <h3 className="text-xl font-display font-bold mb-3">{c.title}</h3>
               <p className="text-muted-foreground leading-relaxed text-sm">{c.desc}</p>

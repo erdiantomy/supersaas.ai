@@ -48,24 +48,27 @@ export function Testimonials() {
   const t = testimonials[idx];
 
   return (
-    <section className="section-padding bg-card/40">
+    <section className="section-padding bg-card/40 relative overflow-hidden">
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,hsl(152_100%_45%/_0.03),transparent_60%)]" />
+
       <div className="container-narrow relative z-10">
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, y: 50, scale: 0.96 }}
+          whileInView={{ opacity: 1, y: 0, scale: 1 }}
           viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
           className="text-center mb-14"
         >
+          <span className="reveal-line" />
           <h2 className="text-3xl md:text-5xl font-display font-bold mb-4">Client Stories</h2>
           <p className="text-lg text-muted-foreground">Don't just take our word for it.</p>
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, y: 20, scale: 0.97 }}
+          initial={{ opacity: 0, y: 40, scale: 0.95 }}
           whileInView={{ opacity: 1, y: 0, scale: 1 }}
           viewport={{ once: true, margin: "-60px" }}
-          transition={{ duration: 0.6, delay: 0.15 }}
+          transition={{ duration: 0.8, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
           className="glass-card p-8 md:p-12 rounded-3xl relative"
         >
           <Quote className="absolute top-8 left-8 text-primary/10 w-20 h-20" />
@@ -74,15 +77,21 @@ export function Testimonials() {
             <AnimatePresence mode="wait">
               <motion.div
                 key={idx}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.3 }}
+                initial={{ opacity: 0, x: 40, scale: 0.97 }}
+                animate={{ opacity: 1, x: 0, scale: 1 }}
+                exit={{ opacity: 0, x: -40, scale: 0.97 }}
+                transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
               >
-                {/* Rating stars */}
                 <div className="flex gap-1 mb-5">
                   {Array.from({ length: t.rating }).map((_, i) => (
-                    <Star key={i} size={18} className="fill-primary text-primary" />
+                    <motion.div
+                      key={i}
+                      initial={{ opacity: 0, scale: 0, rotate: -30 }}
+                      animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                      transition={{ delay: i * 0.08, type: "spring", stiffness: 300 }}
+                    >
+                      <Star size={18} className="fill-primary text-primary glow-icon" />
+                    </motion.div>
                   ))}
                 </div>
 
@@ -91,14 +100,16 @@ export function Testimonials() {
                 </p>
 
                 <div className="flex items-center gap-4">
-                  {/* Avatar */}
-                  <img
+                  <motion.img
                     src={t.photo}
                     alt={t.name}
                     loading="lazy"
                     width={56}
                     height={56}
-                    className="w-14 h-14 rounded-full object-cover ring-2 ring-primary/20"
+                    className="w-14 h-14 rounded-full object-cover ring-2 ring-primary/30"
+                    initial={{ scale: 0.8 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: "spring", stiffness: 200 }}
                   />
 
                   <div className="flex-1">
@@ -108,7 +119,6 @@ export function Testimonials() {
                     </div>
                   </div>
 
-                  {/* Company logo */}
                   <img
                     src={t.logo}
                     alt={t.company}
@@ -119,7 +129,6 @@ export function Testimonials() {
                   />
                 </div>
 
-                {/* Metric badge */}
                 <div className="mt-6">
                   <span className="inline-block text-xs font-semibold px-3 py-1.5 rounded-full bg-primary/10 text-primary border border-primary/20">
                     ✓ {t.metric}
@@ -135,27 +144,36 @@ export function Testimonials() {
                 <button
                   key={i}
                   onClick={() => setIdx(i)}
-                  className={`w-2.5 h-2.5 rounded-full transition-all ${i === idx ? "bg-primary w-8" : "bg-muted-foreground/30"}`}
+                  className={`h-2.5 rounded-full transition-all duration-500 ${i === idx ? "bg-primary w-8" : "bg-muted-foreground/30 w-2.5"}`}
                 />
               ))}
             </div>
             <div className="flex gap-2">
-              <button onClick={prev} className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
+              <motion.button
+                onClick={prev}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+              >
                 <ChevronLeft size={18} />
-              </button>
-              <button onClick={next} className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors">
+              </motion.button>
+              <motion.button
+                onClick={next}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+              >
                 <ChevronRight size={18} />
-              </button>
+              </motion.button>
             </div>
           </div>
         </motion.div>
 
-        {/* Client logos strip */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.3 }}
+          transition={{ duration: 0.7, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
           className="mt-12 text-center"
         >
           <p className="text-xs uppercase tracking-widest text-muted-foreground mb-6">Trusted by innovative companies</p>
@@ -163,11 +181,12 @@ export function Testimonials() {
             {testimonials.map((t, i) => (
               <motion.div
                 key={i}
-                initial={{ opacity: 0, y: 10 }}
+                initial={{ opacity: 0, y: 15 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: 0.4 + i * 0.1 }}
-                className="flex items-center gap-2 opacity-60 hover:opacity-100 transition-opacity"
+                transition={{ delay: 0.4 + i * 0.12 }}
+                whileHover={{ scale: 1.1, opacity: 1 }}
+                className="flex items-center gap-2 opacity-50 hover:opacity-100 transition-all duration-500 cursor-pointer"
               >
                 <img
                   src={t.logo}
