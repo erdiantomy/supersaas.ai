@@ -1,4 +1,4 @@
-import { LayoutDashboard, Users, FolderKanban, Milestone, LogOut, Home } from "lucide-react";
+import { LayoutDashboard, Users, FolderKanban, Milestone, LogOut, Home, Inbox, FileText, DollarSign, Send } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useAuth } from "@/hooks/useAuth";
 import {
@@ -15,13 +15,17 @@ import {
 
 const adminItems = [
   { title: "Overview", url: "/dashboard", icon: LayoutDashboard },
+  { title: "Inquiries", url: "/dashboard/inquiries", icon: Inbox },
+  { title: "Submissions", url: "/dashboard/submissions", icon: FileText },
   { title: "Clients", url: "/dashboard/clients", icon: Users },
   { title: "Projects", url: "/dashboard/projects", icon: FolderKanban },
   { title: "Milestones", url: "/dashboard/milestones", icon: Milestone },
+  { title: "Payments", url: "/dashboard/payments", icon: DollarSign },
 ];
 
 const clientItems = [
   { title: "My Projects", url: "/portal", icon: FolderKanban },
+  { title: "Submit Project", url: "/portal/submit", icon: Send },
 ];
 
 export function DashboardSidebar() {

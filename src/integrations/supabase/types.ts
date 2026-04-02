@@ -53,6 +53,42 @@ export type Database = {
         }
         Relationships: []
       }
+      inquiries: {
+        Row: {
+          company: string | null
+          created_at: string
+          email: string
+          id: string
+          message: string | null
+          name: string
+          notes: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          company?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          message?: string | null
+          name: string
+          notes?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          company?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          message?: string | null
+          name?: string
+          notes?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       milestones: {
         Row: {
           created_at: string
@@ -94,6 +130,60 @@ export type Database = {
           },
         ]
       }
+      payments: {
+        Row: {
+          amount: number
+          client_id: string | null
+          created_at: string
+          currency: string
+          description: string | null
+          id: string
+          paid_at: string | null
+          project_id: string | null
+          revenuecat_id: string | null
+          status: string
+        }
+        Insert: {
+          amount: number
+          client_id?: string | null
+          created_at?: string
+          currency?: string
+          description?: string | null
+          id?: string
+          paid_at?: string | null
+          project_id?: string | null
+          revenuecat_id?: string | null
+          status?: string
+        }
+        Update: {
+          amount?: number
+          client_id?: string | null
+          created_at?: string
+          currency?: string
+          description?: string | null
+          id?: string
+          paid_at?: string | null
+          project_id?: string | null
+          revenuecat_id?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -116,6 +206,86 @@ export type Database = {
           created_at?: string
           full_name?: string | null
           id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      project_comments: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          is_admin: boolean
+          project_id: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          is_admin?: boolean
+          project_id: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          is_admin?: boolean
+          project_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_comments_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      project_submissions: {
+        Row: {
+          budget_range: string | null
+          created_at: string
+          description: string
+          features: string | null
+          id: string
+          project_name: string
+          project_type: string
+          status: string
+          tech_requirements: string | null
+          timeline: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          budget_range?: string | null
+          created_at?: string
+          description: string
+          features?: string | null
+          id?: string
+          project_name: string
+          project_type: string
+          status?: string
+          tech_requirements?: string | null
+          timeline?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          budget_range?: string | null
+          created_at?: string
+          description?: string
+          features?: string | null
+          id?: string
+          project_name?: string
+          project_type?: string
+          status?: string
+          tech_requirements?: string | null
+          timeline?: string | null
           updated_at?: string
           user_id?: string
         }

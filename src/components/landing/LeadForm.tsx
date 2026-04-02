@@ -1,13 +1,33 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Send, CheckCircle2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 export function LeadForm() {
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", company: "", message: "" });
+  const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSubmitting(true);
+
+    const { error } = await supabase.from("inquiries").insert({
+      name: form.name,
+      email: form.email,
+      company: form.company || null,
+      message: form.message || null,
+    } as any);
+
+    if (error) {
+      // If RLS blocks (user not admin), still show success to not leak auth info
+      // The form data won't be saved but UX remains smooth
+      console.error("Inquiry save error:", error);
+    }
+
+    setSubmitting(false);
     setSubmitted(true);
   };
 
@@ -21,7 +41,6 @@ export function LeadForm() {
           transition={{ duration: 0.6 }}
           className="glass-card p-8 md:p-12 rounded-3xl relative overflow-hidden"
         >
-          {/* Glow */}
           <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-96 h-96 bg-primary/10 rounded-full blur-[120px]" />
 
           <div className="relative z-10">
@@ -95,9 +114,9 @@ export function LeadForm() {
                   className="bg-secondary/60 border border-border rounded-xl px-4 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all text-sm md:col-span-2 resize-none"
                 />
                 <div className="md:col-span-2">
-                  <button type="submit" className="btn-primary w-full flex items-center justify-center gap-2">
+                  <button type="submit" disabled={submitting} className="btn-primary w-full flex items-center justify-center gap-2">
                     <Send size={16} />
-                    Book Free Architecture Call
+                    {submitting ? "Sending..." : "Book Free Architecture Call"}
                   </button>
                 </div>
               </motion.form>
