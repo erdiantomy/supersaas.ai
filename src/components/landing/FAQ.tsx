@@ -31,13 +31,26 @@ export function FAQ() {
   return (
     <section id="faq" className="section-padding bg-card/40">
       <div className="max-w-3xl mx-auto px-5 md:px-8">
-        <h2 className="text-3xl md:text-5xl font-display font-bold mb-12 text-center">
+        <motion.h2
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.6 }}
+          className="text-3xl md:text-5xl font-display font-bold mb-12 text-center"
+        >
           Frequently Asked Questions
-        </h2>
+        </motion.h2>
 
         <div className="space-y-3">
           {faqs.map((faq, i) => (
-            <div key={i} className="glass-card rounded-xl overflow-hidden">
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-40px" }}
+              transition={{ duration: 0.4, delay: i * 0.08 }}
+              className="glass-card rounded-xl overflow-hidden"
+            >
               <button
                 className="w-full px-6 py-5 text-left flex justify-between items-center"
                 onClick={() => setOpenIdx(openIdx === i ? null : i)}
@@ -64,7 +77,7 @@ export function FAQ() {
                   </motion.div>
                 )}
               </AnimatePresence>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>

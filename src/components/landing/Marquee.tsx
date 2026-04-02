@@ -1,3 +1,5 @@
+import { motion } from "framer-motion";
+
 const logos = [
   "Google Cloud", "AWS", "Stripe", "Vercel", "Supabase",
   "Next.js", "PostgreSQL", "React", "Node.js", "Figma",
@@ -5,7 +7,13 @@ const logos = [
 
 export function Marquee() {
   return (
-    <section className="py-12 border-y border-border overflow-hidden">
+    <motion.section
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.8 }}
+      className="py-12 border-y border-border overflow-hidden"
+    >
       <div className="flex animate-marquee whitespace-nowrap">
         {[...logos, ...logos].map((logo, i) => (
           <span
@@ -16,6 +24,6 @@ export function Marquee() {
           </span>
         ))}
       </div>
-    </section>
+    </motion.section>
   );
 }
