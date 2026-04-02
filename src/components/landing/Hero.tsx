@@ -31,6 +31,9 @@ const stats = [
 export function Hero() {
   return (
     <section className="relative pt-36 md:pt-44 pb-20 overflow-hidden">
+      {/* Hero background image */}
+      <img src={heroBg} alt="" width={1920} height={1080} className="absolute inset-0 w-full h-full object-cover opacity-40" />
+      <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-background/30" />
       {/* Ambient orbs */}
       <motion.div
         animate={{ scale: [1, 1.2, 1], opacity: [0.2, 0.4, 0.2] }}

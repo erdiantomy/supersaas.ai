@@ -55,6 +55,9 @@ export function CaseStudies() {
               whileHover={{ y: -6 }}
               className="glass-card p-7 rounded-2xl flex flex-col h-full"
             >
+              <div className="rounded-xl overflow-hidden mb-4 border border-border">
+                <img src={c.image} alt={c.industry} loading="lazy" width={800} height={600} className="w-full h-40 object-cover" />
+              </div>
               <div className="text-xs font-mono text-primary mb-3 uppercase tracking-wider">{c.type}</div>
               <h3 className="text-xl font-display font-bold mb-1">{c.industry}</h3>
               <div className="text-xs text-muted-foreground mb-5">{c.region}</div>
