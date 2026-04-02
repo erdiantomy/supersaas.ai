@@ -89,12 +89,22 @@ export default {
           "0%, 100%": { transform: "translateY(0px)" },
           "50%": { transform: "translateY(-10px)" },
         },
+        "glow-pulse": {
+          "0%, 100%": { boxShadow: "0 0 20px hsl(152 100% 45% / 0.1)" },
+          "50%": { boxShadow: "0 0 60px hsl(152 100% 45% / 0.25)" },
+        },
+        "cinema-fade": {
+          "0%": { opacity: "0", transform: "translateY(40px) scale(0.96)" },
+          "100%": { opacity: "1", transform: "translateY(0) scale(1)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "marquee": "marquee 30s linear infinite",
         "float": "float 6s ease-in-out infinite",
+        "glow-pulse": "glow-pulse 4s ease-in-out infinite",
+        "cinema-fade": "cinema-fade 0.8s cubic-bezier(0.16,1,0.3,1) forwards",
       },
     },
   },
