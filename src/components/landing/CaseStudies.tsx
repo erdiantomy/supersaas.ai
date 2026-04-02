@@ -1,5 +1,8 @@
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
+import caseImg1 from "@/assets/case-study-1.jpg";
+import caseImg2 from "@/assets/case-study-2.jpg";
+import caseImg3 from "@/assets/case-study-3.jpg";
 
 const cases = [
   {
@@ -9,6 +12,7 @@ const cases = [
     result: "Reduced inventory discrepancy from 23% to 1.4% in 90 days",
     metrics: ["47 store locations", "8-week delivery", "3 custom integrations"],
     stack: "Next.js · PostgreSQL · AWS",
+    image: caseImg1,
   },
   {
     type: "POS System",
@@ -17,6 +21,7 @@ const cases = [
     result: "Eliminated $14,000/year in third-party POS subscription fees",
     metrics: ["12 outlets", "5-week delivery", "Offline-first architecture"],
     stack: "React · Node.js · SQLite",
+    image: caseImg2,
   },
   {
     type: "Commercial SaaS",
@@ -25,6 +30,7 @@ const cases = [
     result: "Launched MVP in 6 weeks. Reached $40K MRR in 4 months.",
     metrics: ["3 pricing tiers", "Multi-tenant", "Stripe billing"],
     stack: "Next.js · FastAPI · Stripe · AWS",
+    image: caseImg3,
   },
 ];
 
@@ -49,6 +55,9 @@ export function CaseStudies() {
               whileHover={{ y: -6 }}
               className="glass-card p-7 rounded-2xl flex flex-col h-full"
             >
+              <div className="rounded-xl overflow-hidden mb-4 border border-border">
+                <img src={c.image} alt={c.industry} loading="lazy" width={800} height={600} className="w-full h-40 object-cover" />
+              </div>
               <div className="text-xs font-mono text-primary mb-3 uppercase tracking-wider">{c.type}</div>
               <h3 className="text-xl font-display font-bold mb-1">{c.industry}</h3>
               <div className="text-xs text-muted-foreground mb-5">{c.region}</div>

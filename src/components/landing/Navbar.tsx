@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
+import logo from "@/assets/logo.png";
 
 const navLinks = [
   { label: "Services", href: "#services" },
@@ -28,8 +29,11 @@ export function Navbar() {
       }`}
     >
       <div className="container-wide flex items-center justify-between">
-        <a href="#" className="font-display font-bold text-xl tracking-tight">
-          Super<span className="text-primary">SaaS</span>
+        <a href="#" className="flex items-center gap-2">
+          <img src={logo} alt="SuperSaaS" width={36} height={36} className="rounded-lg" />
+          <span className="font-display font-bold text-xl tracking-tight">
+            Super<span className="text-primary">SaaS</span>
+          </span>
         </a>
 
         <div className="hidden md:flex items-center gap-8 text-sm font-medium text-muted-foreground">
