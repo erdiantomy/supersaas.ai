@@ -1,5 +1,8 @@
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
+import caseImg1 from "@/assets/case-study-1.jpg";
+import caseImg2 from "@/assets/case-study-2.jpg";
+import caseImg3 from "@/assets/case-study-3.jpg";
 
 const cases = [
   {
