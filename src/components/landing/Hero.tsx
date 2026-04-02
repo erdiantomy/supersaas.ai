@@ -27,6 +27,8 @@ const stats = [
   { value: 3, suffix: "x", label: "Faster Delivery" },
 ];
 
+const EASE = [0.16, 1, 0.3, 1] as const;
+
 const cinematic = {
   hidden: { opacity: 0, y: 50, scale: 0.95 },
   visible: (i: number) => ({
@@ -36,7 +38,7 @@ const cinematic = {
     transition: {
       duration: 0.9,
       delay: i * 0.15,
-      ease: [0.16, 1, 0.3, 1],
+      ease: EASE as unknown as [number, number, number, number],
     },
   }),
 };

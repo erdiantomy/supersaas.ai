@@ -4,7 +4,7 @@ import { useRef } from "react";
 
 const cinematic = {
   hidden: { opacity: 0, y: 50, scale: 0.96 },
-  visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } },
+  visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] as [number, number, number, number] } },
 };
 
 export function Problem() {
