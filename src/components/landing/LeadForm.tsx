@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Send, CheckCircle2 } from "lucide-react";
+import { Send, CheckCircle2, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -22,8 +22,6 @@ export function LeadForm() {
     } as any);
 
     if (error) {
-      // If RLS blocks (user not admin), still show success to not leak auth info
-      // The form data won't be saved but UX remains smooth
       console.error("Inquiry save error:", error);
     }
 
@@ -32,25 +30,34 @@ export function LeadForm() {
   };
 
   return (
-    <section id="contact" className="section-padding">
-      <div className="container-narrow">
+    <section id="contact" className="section-padding relative overflow-hidden">
+      {/* Cinematic ambient light */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,hsl(152_100%_45%/_0.06),transparent_50%)]" />
+
+      <div className="container-narrow relative z-10">
         <motion.div
-          initial={{ opacity: 0, y: 30, scale: 0.97 }}
+          initial={{ opacity: 0, y: 50, scale: 0.95 }}
           whileInView={{ opacity: 1, y: 0, scale: 1 }}
           viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
           className="glass-card p-8 md:p-12 rounded-3xl relative overflow-hidden"
         >
-          <div className="absolute -top-32 left-1/2 -translate-x-1/2 w-96 h-96 bg-primary/10 rounded-full blur-[120px]" />
+          {/* Glow orb behind form */}
+          <motion.div
+            animate={{ scale: [1, 1.2, 1], opacity: [0.1, 0.2, 0.1] }}
+            transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute -top-32 left-1/2 -translate-x-1/2 w-96 h-96 bg-primary/10 rounded-full blur-[150px]"
+          />
 
           <div className="relative z-10">
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 25 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.15 }}
+              transition={{ duration: 0.7, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
               className="text-center mb-10"
             >
+              <span className="reveal-line" />
               <h2 className="text-3xl md:text-4xl font-display font-bold mb-4">
                 Let's Build Something{" "}
                 <span className="text-gradient-green">Extraordinary</span>
@@ -63,12 +70,17 @@ export function LeadForm() {
 
             {submitted ? (
               <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.4, type: "spring" }}
+                initial={{ opacity: 0, scale: 0.8, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                transition={{ duration: 0.6, type: "spring", stiffness: 200 }}
                 className="text-center py-12"
               >
-                <CheckCircle2 size={48} className="text-primary mx-auto mb-4" />
+                <motion.div
+                  animate={{ rotate: [0, 10, -10, 0] }}
+                  transition={{ delay: 0.3, duration: 0.5 }}
+                >
+                  <CheckCircle2 size={48} className="text-primary mx-auto mb-4 glow-icon" />
+                </motion.div>
                 <h3 className="text-xl font-display font-bold mb-2">Thanks! We'll be in touch.</h3>
                 <p className="text-muted-foreground text-sm">
                   Expect a reply within 24 hours with your free architecture blueprint.
@@ -76,10 +88,10 @@ export function LeadForm() {
               </motion.div>
             ) : (
               <motion.form
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 25 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: 0.25 }}
+                transition={{ duration: 0.7, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
                 onSubmit={handleSubmit}
                 className="grid md:grid-cols-2 gap-4 max-w-2xl mx-auto"
               >
@@ -89,7 +101,7 @@ export function LeadForm() {
                   placeholder="Your name"
                   value={form.name}
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  className="bg-secondary/60 border border-border rounded-xl px-4 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all text-sm"
+                  className="bg-secondary/60 border border-border rounded-xl px-4 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-300 text-sm"
                 />
                 <input
                   required
@@ -97,27 +109,33 @@ export function LeadForm() {
                   placeholder="Work email"
                   value={form.email}
                   onChange={(e) => setForm({ ...form, email: e.target.value })}
-                  className="bg-secondary/60 border border-border rounded-xl px-4 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all text-sm"
+                  className="bg-secondary/60 border border-border rounded-xl px-4 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-300 text-sm"
                 />
                 <input
                   type="text"
                   placeholder="Company name"
                   value={form.company}
                   onChange={(e) => setForm({ ...form, company: e.target.value })}
-                  className="bg-secondary/60 border border-border rounded-xl px-4 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all text-sm md:col-span-2"
+                  className="bg-secondary/60 border border-border rounded-xl px-4 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-300 text-sm md:col-span-2"
                 />
                 <textarea
                   placeholder="Tell us about your project..."
                   value={form.message}
                   onChange={(e) => setForm({ ...form, message: e.target.value })}
                   rows={4}
-                  className="bg-secondary/60 border border-border rounded-xl px-4 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all text-sm md:col-span-2 resize-none"
+                  className="bg-secondary/60 border border-border rounded-xl px-4 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-300 text-sm md:col-span-2 resize-none"
                 />
                 <div className="md:col-span-2">
-                  <button type="submit" disabled={submitting} className="btn-primary w-full flex items-center justify-center gap-2">
+                  <motion.button
+                    type="submit"
+                    disabled={submitting}
+                    whileHover={{ scale: 1.03, boxShadow: "0 0 50px hsl(152 100% 45% / 0.3)" }}
+                    whileTap={{ scale: 0.97 }}
+                    className="btn-primary w-full flex items-center justify-center gap-2"
+                  >
                     <Send size={16} />
                     {submitting ? "Sending..." : "Book Free Architecture Call"}
-                  </button>
+                  </motion.button>
                 </div>
               </motion.form>
             )}

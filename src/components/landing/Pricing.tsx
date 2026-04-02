@@ -48,20 +48,20 @@ const plans = [
   },
 ];
 
-const fade = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0 } };
-
 export function Pricing() {
   return (
-    <section id="pricing" className="section-padding">
-      <div className="container-wide">
+    <section id="pricing" className="section-padding relative overflow-hidden">
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,hsl(152_100%_45%/_0.04),transparent_60%)]" />
+
+      <div className="container-wide relative z-10">
         <motion.div
-          variants={fade}
-          initial="hidden"
-          whileInView="visible"
+          initial={{ opacity: 0, y: 50, scale: 0.96 }}
+          whileInView={{ opacity: 1, y: 0, scale: 1 }}
           viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
           className="text-center mb-16"
         >
+          <span className="reveal-line" />
           <h2 className="text-3xl md:text-5xl font-display font-bold mb-6">
             Transparent Pricing
           </h2>
@@ -74,21 +74,27 @@ export function Pricing() {
           {plans.map((plan, i) => (
             <motion.div
               key={i}
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, y: 60, scale: 0.9 }}
+              whileInView={{ opacity: 1, y: 0, scale: 1 }}
               viewport={{ once: true, margin: "-60px" }}
-              transition={{ duration: 0.5, delay: i * 0.12 }}
-              whileHover={{ y: -6 }}
-              className={`rounded-2xl p-8 flex flex-col h-full transition-all duration-300 ${
+              transition={{ duration: 0.7, delay: i * 0.15, ease: [0.16, 1, 0.3, 1] }}
+              whileHover={{ y: -8, scale: 1.02, transition: { duration: 0.3 } }}
+              className={`rounded-2xl p-8 flex flex-col h-full transition-all duration-500 ${
                 plan.featured
                   ? "glass-card border-primary/40 shadow-[0_0_60px_hsl(152_100%_45%/_0.1)] relative"
-                  : "glass-card"
+                  : "glass-card hover:border-primary/20"
               }`}
             >
               {plan.featured && (
-                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-xs font-bold px-4 py-1 rounded-full uppercase tracking-wider">
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.5 }}
+                  className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-xs font-bold px-4 py-1 rounded-full uppercase tracking-wider"
+                >
                   Most Popular
-                </div>
+                </motion.div>
               )}
 
               <div className="mb-6">
@@ -101,16 +107,25 @@ export function Pricing() {
               </div>
 
               <ul className="space-y-3 mb-8 flex-1">
-                {plan.features.map((f) => (
-                  <li key={f} className="flex items-start gap-3 text-sm text-secondary-foreground">
-                    <Check size={16} className="text-primary mt-0.5 shrink-0" />
+                {plan.features.map((f, fi) => (
+                  <motion.li
+                    key={f}
+                    initial={{ opacity: 0, x: -10 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.3 + fi * 0.06 }}
+                    className="flex items-start gap-3 text-sm text-secondary-foreground"
+                  >
+                    <Check size={16} className="text-primary mt-0.5 shrink-0 glow-icon" />
                     {f}
-                  </li>
+                  </motion.li>
                 ))}
               </ul>
 
-              <a
+              <motion.a
                 href="#contact"
+                whileHover={{ scale: 1.04, boxShadow: plan.featured ? "0 0 50px hsl(152 100% 45% / 0.3)" : "none" }}
+                whileTap={{ scale: 0.97 }}
                 className={`flex items-center justify-center gap-2 py-3.5 rounded-full font-semibold text-sm transition-all ${
                   plan.featured
                     ? "btn-primary"
@@ -118,7 +133,7 @@ export function Pricing() {
                 }`}
               >
                 {plan.cta} <ArrowRight size={16} />
-              </a>
+              </motion.a>
             </motion.div>
           ))}
         </div>

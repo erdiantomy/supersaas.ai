@@ -11,20 +11,20 @@ const rows = [
   { feature: "Delivery", generic: "Instant (misconfigured)", custom: "6–12 weeks (exact fit)" },
 ];
 
-const fade = { hidden: { opacity: 0, y: 30 }, visible: { opacity: 1, y: 0 } };
-
 export function ComparisonTable() {
   return (
-    <section className="section-padding bg-card/40">
-      <div className="container-narrow">
+    <section className="section-padding bg-card/40 relative overflow-hidden">
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,hsl(152_100%_45%/_0.02),transparent_60%)]" />
+
+      <div className="container-narrow relative z-10">
         <motion.div
-          variants={fade}
-          initial="hidden"
-          whileInView="visible"
+          initial={{ opacity: 0, y: 50, scale: 0.96 }}
+          whileInView={{ opacity: 1, y: 0, scale: 1 }}
           viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
           className="text-center mb-16"
         >
+          <span className="reveal-line" />
           <h2 className="text-3xl md:text-5xl font-display font-bold mb-6">
             Generic SaaS vs Super SaaS
           </h2>
@@ -34,10 +34,10 @@ export function ComparisonTable() {
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-60px" }}
-          transition={{ duration: 0.6, delay: 0.15 }}
+          transition={{ duration: 0.7, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
           className="overflow-x-auto"
         >
           <table className="w-full text-left border-collapse">
@@ -54,11 +54,11 @@ export function ComparisonTable() {
               {rows.map((row, i) => (
                 <motion.tr
                   key={i}
-                  initial={{ opacity: 0, x: -10 }}
+                  initial={{ opacity: 0, x: -20 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
-                  transition={{ duration: 0.35, delay: 0.2 + i * 0.06 }}
-                  className="border-b border-border/50 hover:bg-secondary/30 transition-colors"
+                  transition={{ duration: 0.5, delay: 0.2 + i * 0.08, ease: [0.16, 1, 0.3, 1] }}
+                  className="border-b border-border/50 hover:bg-secondary/30 transition-colors duration-300"
                 >
                   <td className="p-4 text-secondary-foreground text-sm">{row.feature}</td>
                   <td className="p-4 text-muted-foreground text-sm">
@@ -73,10 +73,10 @@ export function ComparisonTable() {
                   </td>
                   <td className="p-4 bg-primary/5 text-sm">
                     {typeof row.custom === "boolean" ? (
-                      row.custom ? <Check size={18} className="text-primary" /> : <X size={18} />
+                      row.custom ? <Check size={18} className="text-primary glow-icon" /> : <X size={18} />
                     ) : (
                       <span className="flex items-center gap-2 text-foreground font-medium">
-                        <Check size={14} className="text-primary shrink-0" />
+                        <Check size={14} className="text-primary shrink-0 glow-icon" />
                         {row.custom}
                       </span>
                     )}
