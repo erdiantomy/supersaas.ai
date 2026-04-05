@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__supabase__*",
+      "mcp__vercel__*",
+      "Bash(npx supabase *)",
+      "Bash(npx vitest *)"
+    ],
+    "deny": [
+      "Bash(supabase db reset --linked)",
+      "Bash(*DROP*CASCADE*)"
+    ]
+  }
+}
