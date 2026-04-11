@@ -5,6 +5,7 @@ import { Problem } from "@/components/landing/Problem";
 import { HowItWorks } from "@/components/landing/HowItWorks";
 import { AgentStack } from "@/components/landing/AgentStack";
 import { Services } from "@/components/landing/Services";
+import { ROICalculator } from "@/components/landing/ROICalculator";
 import { ComparisonTable } from "@/components/landing/ComparisonTable";
 import { CaseStudies } from "@/components/landing/CaseStudies";
 import { Testimonials } from "@/components/landing/Testimonials";
@@ -25,6 +26,7 @@ const Index = () => {
         <HowItWorks />
         <AgentStack />
         <Services />
+        <ROICalculator />
         <ComparisonTable />
         <CaseStudies />
         <Testimonials />
