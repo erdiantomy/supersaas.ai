@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Send, CheckCircle2, Shield, Users, Globe } from "lucide-react";
+import { Send, CheckCircle2, Shield, Users, Globe, MessageCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+
+const WHATSAPP_URL = "https://wa.me/6285210104669";
 
 const trustBadges = [
   { icon: Users, label: "50+ Companies" },
@@ -20,6 +22,7 @@ export function LeadForm() {
     e.preventDefault();
     setSubmitting(true);
 
+    // Save to database
     const { error } = await supabase.from("inquiries").insert({
       name: form.name,
       email: form.email,
@@ -29,6 +32,21 @@ export function LeadForm() {
 
     if (error) {
       console.error("Inquiry save error:", error);
+    }
+
+    // Send email notification to admin
+    try {
+      await supabase.functions.invoke("notify-lead", {
+        body: {
+          name: form.name,
+          email: form.email,
+          company: form.company,
+          budget: form.budget,
+          message: form.message,
+        },
+      });
+    } catch (err) {
+      console.error("Email notification error:", err);
     }
 
     setSubmitting(false);
@@ -102,9 +120,20 @@ export function LeadForm() {
                   <CheckCircle2 size={48} className="text-primary mx-auto mb-4 glow-icon" />
                 </motion.div>
                 <h3 className="text-xl font-display font-bold mb-2">Agents Deployed! We'll be in touch.</h3>
-                <p className="text-muted-foreground text-sm">
+                <p className="text-muted-foreground text-sm mb-6">
                   Expect your free architecture blueprint within 48 hours.
                 </p>
+                <motion.a
+                  href={WHATSAPP_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-[#25D366] hover:bg-[#20BD5A] text-white font-semibold rounded-xl transition-colors"
+                >
+                  <MessageCircle size={18} />
+                  Chat on WhatsApp
+                </motion.a>
               </motion.div>
             ) : (
               <motion.form
@@ -156,17 +185,28 @@ export function LeadForm() {
                   rows={4}
                   className="bg-secondary/60 border border-border rounded-xl px-4 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-300 text-sm md:col-span-2 resize-none"
                 />
-                <div className="md:col-span-2">
+                <div className="md:col-span-2 flex flex-col sm:flex-row gap-3">
                   <motion.button
                     type="submit"
                     disabled={submitting}
                     whileHover={{ scale: 1.03, boxShadow: "0 0 50px hsl(152 100% 45% / 0.3)" }}
                     whileTap={{ scale: 0.97 }}
-                    className="btn-primary w-full flex items-center justify-center gap-2"
+                    className="btn-primary flex-1 flex items-center justify-center gap-2"
                   >
                     <Send size={16} />
                     {submitting ? "Deploying Agents..." : "Book Free Architecture Call"}
                   </motion.button>
+                  <motion.a
+                    href={WHATSAPP_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    whileHover={{ scale: 1.03 }}
+                    whileTap={{ scale: 0.97 }}
+                    className="flex items-center justify-center gap-2 px-6 py-3 bg-[#25D366] hover:bg-[#20BD5A] text-white font-semibold rounded-xl transition-colors text-sm"
+                  >
+                    <MessageCircle size={16} />
+                    WhatsApp Us
+                  </motion.a>
                 </div>
               </motion.form>
             )}
