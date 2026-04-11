@@ -3,24 +3,44 @@ import { motion, AnimatePresence } from "framer-motion";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { useAuth } from "@/hooks/useAuth";
 import { useAgentChat } from "@/hooks/useAgentChat";
-import { Bot, Send, Sparkles, ArrowRight, CheckCircle2, Loader2 } from "lucide-react";
+import { useWorkflowOrchestra, WorkflowStatus } from "@/hooks/useWorkflowOrchestra";
+import { Bot, Send, Sparkles, ArrowRight, CheckCircle2, Loader2, Zap, Brain, Calculator, HandshakeIcon, CreditCard, Code, TestTube, Rocket, Activity } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import ReactMarkdown from "react-markdown";
 
 const WIZARD_STEPS = [
-  { agent: "planner", label: "Discovery", description: "Tell us your business problem" },
-  { agent: "architect", label: "Architecture", description: "AI designs your solution" },
-  { agent: "negotiator", label: "Proposal", description: "Review scope & pricing" },
+  { agent: "planner", label: "Discovery", description: "Tell us your business problem", icon: Brain, status: "planning" as WorkflowStatus },
+  { agent: "architect", label: "Architecture", description: "AI designs your solution", icon: Code, status: "architecting" as WorkflowStatus },
+  { agent: "negotiator", label: "Proposal", description: "Review scope & pricing", icon: Calculator, status: "quoting" as WorkflowStatus },
 ];
+
+const PIPELINE_STAGES: { status: WorkflowStatus; label: string; icon: any }[] = [
+  { status: "intake", label: "Intake", icon: Sparkles },
+  { status: "planning", label: "Planning", icon: Brain },
+  { status: "architecting", label: "Architecture", icon: Code },
+  { status: "quoting", label: "Quoting", icon: Calculator },
+  { status: "negotiating", label: "Negotiation", icon: HandshakeIcon },
+  { status: "paid", label: "Payment", icon: CreditCard },
+  { status: "building", label: "Building", icon: Zap },
+  { status: "testing", label: "Testing", icon: TestTube },
+  { status: "deploying", label: "Deploying", icon: Rocket },
+  { status: "live", label: "Live", icon: Activity },
+];
+
+const STATUS_ORDER = PIPELINE_STAGES.map(s => s.status);
 
 export default function NewProject() {
   const { user } = useAuth();
   const [step, setStep] = useState(0);
   const [input, setInput] = useState("");
+  const [showPipeline, setShowPipeline] = useState(false);
   const chatRef = useRef<HTMLDivElement>(null);
 
   const currentAgent = WIZARD_STEPS[step].agent;
   const { messages, isLoading, send, reset } = useAgentChat(currentAgent);
+  const { workflow, isProcessing, startWorkflow, advanceWorkflow } = useWorkflowOrchestra();
 
   useEffect(() => {
     chatRef.current?.scrollTo({ top: chatRef.current.scrollHeight, behavior: "smooth" });
@@ -29,15 +49,26 @@ export default function NewProject() {
   const handleSend = () => {
     if (!input.trim() || isLoading) return;
     send(input, undefined, user?.id);
+
+    // Auto-start orchestration on first message
+    if (step === 0 && messages.length === 0 && user?.id) {
+      startWorkflow(input, user.id).catch(console.error);
+    }
+
     setInput("");
   };
 
-  const handleNextStep = () => {
+  const handleNextStep = async () => {
     if (step < WIZARD_STEPS.length - 1) {
       const lastAssistantMsg = messages.filter((m) => m.role === "assistant").pop()?.content || "";
       setStep(step + 1);
       reset();
-      // Auto-seed next agent with context
+
+      // Advance the orchestration pipeline
+      if (workflow?.id) {
+        advanceWorkflow().catch(console.error);
+      }
+
       setTimeout(() => {
         send(
           `Based on the previous analysis:\n\n${lastAssistantMsg.slice(0, 2000)}\n\nPlease proceed with your analysis.`,
@@ -45,8 +76,105 @@ export default function NewProject() {
           user?.id
         );
       }, 300);
+    } else {
+      // Final step — show pipeline view
+      setShowPipeline(true);
+      if (workflow?.id) advanceWorkflow().catch(console.error);
     }
   };
+
+  const currentStatusIdx = workflow ? STATUS_ORDER.indexOf(workflow.current_status) : -1;
+
+  if (showPipeline && workflow) {
+    return (
+      <DashboardLayout>
+        <div className="max-w-4xl mx-auto space-y-6">
+          <h1 className="text-2xl font-display font-bold">Orchestration Pipeline</h1>
+          <p className="text-muted-foreground text-sm">Your project is being processed by the AI Agent Orchestra</p>
+
+          {/* Pipeline visualization */}
+          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+            {PIPELINE_STAGES.map((stage, i) => {
+              const isActive = workflow.current_status === stage.status;
+              const isDone = currentStatusIdx > i;
+              return (
+                <motion.div
+                  key={stage.status}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: i * 0.05 }}
+                >
+                  <Card className={`glass-card transition-all ${isActive ? "ring-2 ring-primary" : ""} ${isDone ? "opacity-60" : ""}`}>
+                    <CardContent className="p-3 text-center">
+                      <stage.icon size={20} className={`mx-auto mb-1 ${isActive ? "text-primary animate-pulse" : isDone ? "text-primary" : "text-muted-foreground"}`} />
+                      <div className="text-xs font-medium">{stage.label}</div>
+                      {isDone && <CheckCircle2 size={12} className="text-primary mx-auto mt-1" />}
+                      {isActive && <Loader2 size={12} className="animate-spin text-primary mx-auto mt-1" />}
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              );
+            })}
+          </div>
+
+          {/* Output cards */}
+          <div className="grid md:grid-cols-2 gap-4">
+            {workflow.planner_output && (
+              <Card className="glass-card">
+                <CardContent className="p-4">
+                  <h3 className="font-display font-bold text-sm mb-2 flex items-center gap-2">
+                    <Brain size={14} className="text-primary" /> Planner Output
+                  </h3>
+                  <pre className="text-xs text-muted-foreground overflow-auto max-h-48">
+                    {JSON.stringify(workflow.planner_output, null, 2)}
+                  </pre>
+                </CardContent>
+              </Card>
+            )}
+            {workflow.architecture_json && (
+              <Card className="glass-card">
+                <CardContent className="p-4">
+                  <h3 className="font-display font-bold text-sm mb-2 flex items-center gap-2">
+                    <Code size={14} className="text-primary" /> Architecture
+                  </h3>
+                  <pre className="text-xs text-muted-foreground overflow-auto max-h-48">
+                    {JSON.stringify(workflow.architecture_json, null, 2)}
+                  </pre>
+                </CardContent>
+              </Card>
+            )}
+            {workflow.quote_data && (
+              <Card className="glass-card col-span-full">
+                <CardContent className="p-4">
+                  <h3 className="font-display font-bold text-sm mb-2 flex items-center gap-2">
+                    <Calculator size={14} className="text-primary" /> Quote
+                  </h3>
+                  <pre className="text-xs text-muted-foreground overflow-auto max-h-48">
+                    {JSON.stringify(workflow.quote_data, null, 2)}
+                  </pre>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+
+          {/* Metadata */}
+          <div className="flex gap-4 text-sm">
+            <Badge variant="secondary">Timeline: {workflow.metadata?.timeline_days || "—"} days</Badge>
+            <Badge variant="secondary">Projected ROI: ${(workflow.metadata?.projected_roi || 0).toLocaleString()}</Badge>
+            <Badge variant="secondary">Agent Minutes: {workflow.metadata?.total_agent_minutes || 0}</Badge>
+          </div>
+
+          {/* Advance button */}
+          {!["live", "optimizing", "paused", "shutdown"].includes(workflow.current_status) && (
+            <Button onClick={() => advanceWorkflow()} disabled={isProcessing} className="gap-2">
+              {isProcessing ? <Loader2 size={14} className="animate-spin" /> : <ArrowRight size={14} />}
+              Advance Pipeline
+            </Button>
+          )}
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout>
@@ -78,6 +206,16 @@ export default function NewProject() {
           ))}
         </div>
 
+        {/* Orchestration status badge */}
+        {workflow && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mb-4">
+            <Badge variant="outline" className="gap-2">
+              <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+              Orchestra: {workflow.current_status}
+            </Badge>
+          </motion.div>
+        )}
+
         {/* Agent header */}
         <motion.div
           key={step}
@@ -105,8 +243,8 @@ export default function NewProject() {
                 <Sparkles size={32} className="text-primary mx-auto mb-3" />
                 <h3 className="font-display font-bold text-lg mb-1">Describe Your Business Problem</h3>
                 <p className="text-sm text-muted-foreground max-w-md">
-                  Tell our Discovery Agent about your business challenge in plain English. 
-                  Be as detailed as you like — the AI will analyze and propose a solution.
+                  Tell our Discovery Agent about your business challenge in plain English.
+                  The AI Orchestra will analyze, architect, and propose a solution autonomously.
                 </p>
               </div>
             </div>
@@ -163,9 +301,13 @@ export default function NewProject() {
           <Button onClick={handleSend} disabled={isLoading || !input.trim()} className="rounded-xl px-4">
             <Send size={16} />
           </Button>
-          {messages.length > 1 && !isLoading && step < WIZARD_STEPS.length - 1 && (
+          {messages.length > 1 && !isLoading && (
             <Button onClick={handleNextStep} variant="outline" className="rounded-xl gap-2">
-              Next: {WIZARD_STEPS[step + 1].label} <ArrowRight size={14} />
+              {step < WIZARD_STEPS.length - 1 ? (
+                <>Next: {WIZARD_STEPS[step + 1].label} <ArrowRight size={14} /></>
+              ) : (
+                <>Launch Pipeline <Rocket size={14} /></>
+              )}
             </Button>
           )}
         </div>
