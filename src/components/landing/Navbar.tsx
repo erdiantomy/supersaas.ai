@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Zap } from "lucide-react";
 import logo from "@/assets/logo.png";
 
 const navLinks = [
+  { label: "How It Works", href: "#process" },
   { label: "Agent Stack", href: "#agent-stack" },
   { label: "Solutions", href: "#services" },
-  { label: "Process", href: "#process" },
   { label: "Results", href: "#case-studies" },
   { label: "Pricing", href: "#pricing" },
 ];
@@ -42,6 +42,7 @@ export function Navbar() {
           <img src={logo} alt="SuperSaaS" width={36} height={36} className="rounded-lg" />
           <span className="font-display font-bold text-xl tracking-tight">
             Super<span className="text-primary">SaaS</span>
+            <span className="text-xs text-muted-foreground font-normal ml-1">.ai</span>
           </span>
         </motion.a>
 
@@ -62,15 +63,15 @@ export function Navbar() {
         </div>
 
         <motion.a
-          href="#contact"
+          href="/auth"
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.6 }}
           whileHover={{ scale: 1.05, boxShadow: "0 0 30px hsl(152 100% 45% / 0.3)" }}
           whileTap={{ scale: 0.95 }}
-          className="hidden md:inline-flex btn-primary text-sm"
+          className="hidden md:inline-flex btn-primary text-sm items-center gap-2"
         >
-          Book Free Call
+          <Zap size={14} /> Launch Orchestra
         </motion.a>
 
         <button
@@ -106,14 +107,14 @@ export function Navbar() {
                 </motion.a>
               ))}
               <motion.a
-                href="#contact"
+                href="/auth"
                 onClick={() => setMobileOpen(false)}
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: navLinks.length * 0.07 }}
-                className="btn-primary text-center text-sm mt-2"
+                className="btn-primary text-center text-sm mt-2 flex items-center justify-center gap-2"
               >
-                Book Free Call
+                <Zap size={14} /> Launch Orchestra
               </motion.a>
             </div>
           </motion.div>

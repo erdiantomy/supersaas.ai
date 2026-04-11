@@ -1,4 +1,4 @@
-import { LayoutDashboard, Users, FolderKanban, Milestone, LogOut, Home, Inbox, FileText, DollarSign, Send } from "lucide-react";
+import { LayoutDashboard, Users, FolderKanban, Milestone, LogOut, Home, Inbox, FileText, DollarSign, Send, Bot, Sparkles } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useAuth } from "@/hooks/useAuth";
 import {
@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/sidebar";
 
 const adminItems = [
-  { title: "Overview", url: "/dashboard", icon: LayoutDashboard },
+  { title: "Command Center", url: "/dashboard", icon: LayoutDashboard },
   { title: "Inquiries", url: "/dashboard/inquiries", icon: Inbox },
   { title: "Submissions", url: "/dashboard/submissions", icon: FileText },
   { title: "Clients", url: "/dashboard/clients", icon: Users },
@@ -25,6 +25,7 @@ const adminItems = [
 
 const clientItems = [
   { title: "My Projects", url: "/portal", icon: FolderKanban },
+  { title: "New Project (AI)", url: "/portal/new", icon: Sparkles },
   { title: "Submit Project", url: "/portal/submit", icon: Send },
 ];
 
@@ -43,6 +44,7 @@ export function DashboardSidebar() {
             {!collapsed && (
               <span className="font-display font-bold text-sm">
                 Super<span className="text-primary">SaaS</span>
+                <span className="text-xs text-muted-foreground font-normal ml-1">.ai</span>
               </span>
             )}
           </SidebarGroupLabel>

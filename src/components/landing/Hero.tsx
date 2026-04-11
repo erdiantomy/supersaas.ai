@@ -1,6 +1,6 @@
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
-import { ArrowRight, Sparkles, Bot } from "lucide-react";
+import { ArrowRight, Bot, Zap } from "lucide-react";
 import heroBg from "@/assets/hero-bg.jpg";
 
 function Counter({ end, suffix = "" }: { end: number; suffix?: string }) {
@@ -24,7 +24,7 @@ const stats = [
   { value: 200, suffix: "+", label: "Agent Deployments" },
   { value: 14, suffix: "", label: "Industries" },
   { value: 92, suffix: "%", label: "Automation Rate" },
-  { value: 6, suffix: "x", label: "Faster Than Agency", highlight: true },
+  { value: 10, suffix: "x", label: "Faster Than Agency", highlight: true },
 ];
 
 const EASE = [0.16, 1, 0.3, 1] as const;
@@ -90,7 +90,7 @@ export function Hero() {
         >
           <Bot size={14} className="text-primary glow-icon" />
           <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-          Agent Swarm v3.0 — Now Live
+          100% Autonomous AI Orchestra — Now Live
         </motion.div>
 
         <motion.h1
@@ -100,9 +100,11 @@ export function Hero() {
           animate="visible"
           className="text-4xl sm:text-5xl md:text-7xl font-display font-bold tracking-tight mb-6 leading-[1.1]"
         >
-          <span className="text-gradient-white">Your Next Enterprise System</span>
+          <span className="text-gradient-white">AI Agents That Build,</span>
           <br />
-          <span className="text-gradient-green">Builds Itself.</span>
+          <span className="text-gradient-white">Deploy & Run Your</span>
+          <br />
+          <span className="text-gradient-green">Entire Business.</span>
         </motion.h1>
 
         <motion.p
@@ -112,8 +114,9 @@ export function Hero() {
           animate="visible"
           className="text-lg md:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed"
         >
-          We orchestrate autonomous AI agents that architect, code, test, and deploy —
-          delivering in weeks what agencies take months. You own everything.
+          10× faster. 80% cheaper. Infinitely better than any software agency.
+          Our autonomous AI agent orchestra handles everything — from discovery to deployment — 
+          with zero human intervention.
         </motion.p>
 
         <motion.div
@@ -124,20 +127,20 @@ export function Hero() {
           className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-20"
         >
           <motion.a
-            href="#contact"
+            href="/auth"
             whileHover={{ scale: 1.05, boxShadow: "0 0 60px hsl(152 100% 45% / 0.35)" }}
             whileTap={{ scale: 0.97 }}
             className="btn-primary flex items-center gap-2 w-full sm:w-auto justify-center"
           >
-            See It Build Live <ArrowRight size={18} />
+            <Zap size={18} /> Start Free — Let AI Handle Everything
           </motion.a>
           <motion.a
-            href="#case-studies"
+            href="#process"
             whileHover={{ scale: 1.04 }}
             whileTap={{ scale: 0.97 }}
             className="btn-ghost w-full sm:w-auto text-center"
           >
-            View Case Studies
+            See How It Works <ArrowRight size={16} className="ml-1" />
           </motion.a>
         </motion.div>
 

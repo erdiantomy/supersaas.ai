@@ -14,6 +14,47 @@ export type Database = {
   }
   public: {
     Tables: {
+      agent_logs: {
+        Row: {
+          action: string
+          agent_type: string
+          created_at: string
+          details: Json | null
+          id: string
+          project_id: string | null
+          status: string
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          agent_type: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          project_id?: string | null
+          status?: string
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          agent_type?: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          project_id?: string | null
+          status?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agent_logs_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       clients: {
         Row: {
           company: string | null
@@ -52,6 +93,47 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: []
+      }
+      generated_apps: {
+        Row: {
+          code_snapshot: Json | null
+          created_at: string
+          deploy_url: string | null
+          id: string
+          project_id: string
+          status: string
+          updated_at: string
+          version: number
+        }
+        Insert: {
+          code_snapshot?: Json | null
+          created_at?: string
+          deploy_url?: string | null
+          id?: string
+          project_id: string
+          status?: string
+          updated_at?: string
+          version?: number
+        }
+        Update: {
+          code_snapshot?: Json | null
+          created_at?: string
+          deploy_url?: string | null
+          id?: string
+          project_id?: string
+          status?: string
+          updated_at?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "generated_apps_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       inquiries: {
         Row: {
@@ -328,6 +410,59 @@ export type Database = {
             columns: ["client_id"]
             isOneToOne: false
             referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quotes: {
+        Row: {
+          ai_reasoning: string | null
+          counter_offer_details: Json | null
+          created_at: string
+          currency: string
+          id: string
+          price: number
+          project_id: string | null
+          proposed_scope: string
+          status: string
+          timeline: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          ai_reasoning?: string | null
+          counter_offer_details?: Json | null
+          created_at?: string
+          currency?: string
+          id?: string
+          price?: number
+          project_id?: string | null
+          proposed_scope: string
+          status?: string
+          timeline?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          ai_reasoning?: string | null
+          counter_offer_details?: Json | null
+          created_at?: string
+          currency?: string
+          id?: string
+          price?: number
+          project_id?: string | null
+          proposed_scope?: string
+          status?: string
+          timeline?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quotes_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
             referencedColumns: ["id"]
           },
         ]

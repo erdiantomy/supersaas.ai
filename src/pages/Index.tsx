@@ -2,9 +2,9 @@ import { Navbar } from "@/components/landing/Navbar";
 import { Hero } from "@/components/landing/Hero";
 import { TechPartners } from "@/components/landing/Marquee";
 import { Problem } from "@/components/landing/Problem";
+import { HowItWorks } from "@/components/landing/HowItWorks";
 import { AgentStack } from "@/components/landing/AgentStack";
 import { Services } from "@/components/landing/Services";
-import { HowItWorks } from "@/components/landing/HowItWorks";
 import { ComparisonTable } from "@/components/landing/ComparisonTable";
 import { CaseStudies } from "@/components/landing/CaseStudies";
 import { Testimonials } from "@/components/landing/Testimonials";
@@ -22,9 +22,9 @@ const Index = () => {
         <Hero />
         <TechPartners />
         <Problem />
+        <HowItWorks />
         <AgentStack />
         <Services />
-        <HowItWorks />
         <ComparisonTable />
         <CaseStudies />
         <Testimonials />
