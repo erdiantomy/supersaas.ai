@@ -1,36 +1,26 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
-const CORS_HEADERS = {
+const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+const GATEWAY_URL = "https://connector-gateway.lovable.dev/resend";
 const ADMIN_EMAIL = "tom@nosecret.co";
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
-    return new Response(null, { headers: CORS_HEADERS });
+    return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { name, email, company, budget, message } = await req.json();
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
-    // Send notification email via Resend-compatible API or SMTP
-    // For now, use a simple fetch to a mail endpoint
     const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
-    
-    const emailBody = `
-New Lead Submission from SuperSaaS.ai
+    if (!RESEND_API_KEY) throw new Error("RESEND_API_KEY is not configured");
 
-Name: ${name}
-Email: ${email}
-Company: ${company || "Not provided"}
-Budget: ${budget || "Not specified"}
-Message: ${message || "No message"}
-
----
-Reply directly to this email or reach out to the lead.
-    `.trim();
+    const { name, email, company, budget, message } = await req.json();
 
     const htmlBody = `
 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
@@ -47,39 +37,39 @@ Reply directly to this email or reach out to the lead.
   </div>
   <hr style="margin-top: 24px; border: none; border-top: 1px solid #eee;" />
   <p style="color: #999; font-size: 12px;">This notification was sent from the SuperSaaS.ai lead form.</p>
-</div>
-    `.trim();
+</div>`.trim();
 
-    if (RESEND_API_KEY) {
-      const res = await fetch("https://api.resend.com/emails", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${RESEND_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          from: "SuperSaaS.ai <noreply@notify.nosecret.co>",
-          to: [ADMIN_EMAIL],
-          reply_to: email,
-          subject: `New Lead: ${name}${company ? ` (${company})` : ""}`,
-          html: htmlBody,
-          text: emailBody,
-        }),
-      });
-      const result = await res.json();
-      console.log("Email sent:", result);
-    } else {
-      console.log("No RESEND_API_KEY set, logging lead instead:", { name, email, company, budget, message });
+    const response = await fetch(`${GATEWAY_URL}/emails`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${LOVABLE_API_KEY}`,
+        "X-Connection-Api-Key": RESEND_API_KEY,
+      },
+      body: JSON.stringify({
+        from: "SuperSaaS.ai <onboarding@resend.dev>",
+        to: [ADMIN_EMAIL],
+        reply_to: email,
+        subject: `New Lead: ${name}${company ? ` (${company})` : ""}`,
+        html: htmlBody,
+      }),
+    });
+
+    const result = await response.json();
+    if (!response.ok) {
+      throw new Error(`Resend API failed [${response.status}]: ${JSON.stringify(result)}`);
     }
 
+    console.log("Email sent:", result);
+
     return new Response(JSON.stringify({ success: true }), {
-      headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error) {
     console.error("Error:", error);
     return new Response(JSON.stringify({ error: error.message }), {
       status: 500,
-      headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
 });
