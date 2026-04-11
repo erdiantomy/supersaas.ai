@@ -1,6 +1,6 @@
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight, Sparkles, Bot } from "lucide-react";
 import heroBg from "@/assets/hero-bg.jpg";
 
 function Counter({ end, suffix = "" }: { end: number; suffix?: string }) {
@@ -21,10 +21,10 @@ function Counter({ end, suffix = "" }: { end: number; suffix?: string }) {
 }
 
 const stats = [
-  { value: 48, suffix: "+", label: "Systems Delivered" },
-  { value: 12, suffix: "+", label: "Countries Served" },
-  { value: 4, suffix: ".9★", label: "Client Rating" },
-  { value: 3, suffix: "x", label: "Faster Delivery" },
+  { value: 200, suffix: "+", label: "Agent Deployments" },
+  { value: 14, suffix: "", label: "Industries" },
+  { value: 92, suffix: "%", label: "Automation Rate" },
+  { value: 6, suffix: "x", label: "Faster Than Agency", highlight: true },
 ];
 
 const EASE = [0.16, 1, 0.3, 1] as const;
@@ -52,16 +52,13 @@ export function Hero() {
 
   return (
     <section ref={ref} className="relative pt-36 md:pt-44 pb-20 overflow-hidden min-h-[100vh]">
-      {/* Parallax background */}
       <motion.div style={{ y: bgY, scale: bgScale }} className="absolute inset-0">
         <img src={heroBg} alt="" width={1920} height={1080} className="w-full h-full object-cover opacity-35" />
       </motion.div>
 
-      {/* Cinematic vignette */}
       <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-background/20" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,hsl(var(--background))_100%)]" />
 
-      {/* Ambient orbs with slow cinema-style pulsing */}
       <motion.div
         animate={{ scale: [1, 1.3, 1], opacity: [0.15, 0.35, 0.15] }}
         transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
@@ -73,7 +70,6 @@ export function Hero() {
         className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-[hsl(var(--ring))]/10 rounded-full blur-[200px]"
       />
 
-      {/* Scan line effect */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
           animate={{ y: ["-100%", "200%"] }}
@@ -92,9 +88,9 @@ export function Hero() {
           animate="visible"
           className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-card text-sm text-muted-foreground mb-8"
         >
-          <Sparkles size={14} className="text-primary glow-icon" />
+          <Bot size={14} className="text-primary glow-icon" />
           <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-          Now accepting Q2 2026 projects
+          Agent Swarm v3.0 — Now Live
         </motion.div>
 
         <motion.h1
@@ -104,9 +100,9 @@ export function Hero() {
           animate="visible"
           className="text-4xl sm:text-5xl md:text-7xl font-display font-bold tracking-tight mb-6 leading-[1.1]"
         >
-          <span className="text-gradient-white">Stop Paying for Software</span>
+          <span className="text-gradient-white">Your Next Enterprise System</span>
           <br />
-          <span className="text-gradient-green">That Almost Fits.</span>
+          <span className="text-gradient-green">Builds Itself.</span>
         </motion.h1>
 
         <motion.p
@@ -116,8 +112,8 @@ export function Hero() {
           animate="visible"
           className="text-lg md:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed"
         >
-          We build exactly what your business needs — custom ERP, POS, and SaaS —
-          3x faster with AI-assisted architecture. Built in Jakarta. Deployed globally.
+          We orchestrate autonomous AI agents that architect, code, test, and deploy —
+          delivering in weeks what agencies take months. You own everything.
         </motion.p>
 
         <motion.div
@@ -133,7 +129,7 @@ export function Hero() {
             whileTap={{ scale: 0.97 }}
             className="btn-primary flex items-center gap-2 w-full sm:w-auto justify-center"
           >
-            Book Architecture Call <ArrowRight size={18} />
+            See It Build Live <ArrowRight size={18} />
           </motion.a>
           <motion.a
             href="#case-studies"
@@ -162,7 +158,7 @@ export function Hero() {
                 transition={{ duration: 0.7, delay: 0.8 + i * 0.12, ease: [0.16, 1, 0.3, 1] }}
                 className="text-center group"
               >
-                <div className={`text-3xl md:text-4xl font-display font-bold mb-1 transition-all duration-500 group-hover:drop-shadow-[0_0_12px_hsl(152_100%_45%/_0.4)] ${s.label === "Faster Delivery" ? "text-primary" : "text-foreground"}`}>
+                <div className={`text-3xl md:text-4xl font-display font-bold mb-1 transition-all duration-500 group-hover:drop-shadow-[0_0_12px_hsl(152_100%_45%/_0.4)] ${s.highlight ? "text-primary" : "text-foreground"}`}>
                   <Counter end={s.value} suffix={s.suffix} />
                 </div>
                 <div className="text-xs text-muted-foreground uppercase tracking-widest font-medium">

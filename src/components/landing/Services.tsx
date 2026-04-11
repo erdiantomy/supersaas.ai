@@ -1,53 +1,53 @@
 import { motion } from "framer-motion";
-import { Database, ShoppingCart, Cloud, Plug } from "lucide-react";
+import { ShoppingBag, Truck, Landmark, HeartPulse } from "lucide-react";
 import demoErp from "@/assets/demo-erp.jpg";
 import demoPos from "@/assets/demo-pos.jpg";
 import demoSaas from "@/assets/demo-saas.jpg";
 
-const heroServices = [
+const domains = [
   {
-    icon: Database,
-    title: "Custom ERP",
-    desc: "Multi-branch inventory, HR, finance, and operations — built around your exact workflow, not a template.",
-    tags: ["Multi-branch", "Real-time sync", "Custom reports"],
+    icon: ShoppingBag,
+    title: "Retail & Commerce",
+    desc: "Unified inventory, POS, and omnichannel — from single storefront to 100+ branches. Replace 4 SaaS tools with one system you own.",
+    tags: ["Unified Inventory", "Omnichannel POS", "Loyalty Engine"],
     image: demoErp,
     features: [
-      "Warehouse & inventory management across 50+ locations",
-      "Automated purchase orders & supplier tracking",
-      "Real-time financial dashboards with role-based access",
+      "Multi-branch inventory with real-time sync across 50+ locations",
+      "Offline-first POS with automatic cloud reconciliation",
+      "Custom loyalty programs with AI-driven customer segmentation",
     ],
   },
   {
-    icon: ShoppingCart,
-    title: "POS Systems",
-    desc: "Offline-first point-of-sale with custom pricing logic, loyalty programs, and hardware integration.",
-    tags: ["Offline-first", "Multi-outlet", "Custom pricing"],
+    icon: Truck,
+    title: "Logistics & Supply Chain",
+    desc: "Route optimization, warehouse management, and real-time fleet tracking — purpose-built for your operational complexity.",
+    tags: ["Route Optimization", "Warehouse Mgmt", "Fleet Tracking"],
     image: demoPos,
     features: [
-      "Works without internet — syncs when back online",
-      "Kitchen display, receipt printer & payment terminal integration",
-      "Custom loyalty programs & dynamic pricing rules",
+      "AI-optimized delivery routes saving 30% on fuel costs",
+      "Barcode/RFID warehouse management with pick-pack-ship workflows",
+      "Real-time GPS fleet tracking with automated dispatch",
     ],
   },
   {
-    icon: Cloud,
-    title: "SaaS Products",
-    desc: "From MVP to scale — multi-tenant architecture, billing integration, and analytics built in from day one.",
-    tags: ["Multi-tenant", "Stripe billing", "Analytics"],
+    icon: Landmark,
+    title: "Financial Services",
+    desc: "Compliance engines, portfolio analytics, and payment orchestration — built for regulatory rigor and high-throughput processing.",
+    tags: ["Compliance Engine", "Portfolio Analytics", "Payment Orchestration"],
     image: demoSaas,
     features: [
-      "Multi-tenant architecture with data isolation",
-      "Subscription billing with Stripe or local gateways",
-      "Usage analytics & customer success dashboards",
+      "Automated KYC/AML compliance with audit trail",
+      "Real-time portfolio analytics with risk scoring",
+      "Multi-gateway payment orchestration with failover",
     ],
   },
 ];
 
-const extraService = {
-  icon: Plug,
-  title: "API & Integration",
-  desc: "Connect your existing tools with custom middleware, data pipelines, and real-time sync.",
-  tags: ["REST / GraphQL", "Webhooks", "ETL pipelines"],
+const extraDomain = {
+  icon: HeartPulse,
+  title: "Healthcare & Operations",
+  desc: "Patient flow optimization, scheduling intelligence, and regulatory compliance — HIPAA-ready from architecture to deployment.",
+  tags: ["Patient Flow", "Smart Scheduling", "HIPAA Compliant"],
 };
 
 export function Services() {
@@ -64,14 +64,14 @@ export function Services() {
           className="text-center mb-16"
         >
           <span className="reveal-line" />
-          <h2 className="text-3xl md:text-5xl font-display font-bold mb-6">What We Build</h2>
+          <h2 className="text-3xl md:text-5xl font-display font-bold mb-6">Solution Domains</h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Complex systems that generic SaaS can't handle.
+            We don't build generic software. We build industry-specific systems powered by AI agents that understand your vertical.
           </p>
         </motion.div>
 
         <div className="space-y-8 mb-8">
-          {heroServices.map((s, i) => (
+          {domains.map((s, i) => (
             <motion.div
               key={i}
               initial={{ opacity: 0, y: 60, scale: 0.95 }}
@@ -150,13 +150,13 @@ export function Services() {
         >
           <div className="flex items-start gap-5">
             <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center text-primary shrink-0 group-hover:bg-primary/20 transition-colors glow-icon">
-              <extraService.icon size={22} />
+              <extraDomain.icon size={22} />
             </div>
             <div>
-              <h3 className="text-xl font-display font-bold mb-2">{extraService.title}</h3>
-              <p className="text-muted-foreground text-sm leading-relaxed mb-4">{extraService.desc}</p>
+              <h3 className="text-xl font-display font-bold mb-2">{extraDomain.title}</h3>
+              <p className="text-muted-foreground text-sm leading-relaxed mb-4">{extraDomain.desc}</p>
               <div className="flex flex-wrap gap-2">
-                {extraService.tags.map((t) => (
+                {extraDomain.tags.map((t) => (
                   <span key={t} className="text-xs px-3 py-1 rounded-full bg-secondary text-muted-foreground">
                     {t}
                   </span>

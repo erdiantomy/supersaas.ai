@@ -1,35 +1,38 @@
 import { motion } from "framer-motion";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Bot } from "lucide-react";
 import caseImg1 from "@/assets/case-study-1.jpg";
 import caseImg2 from "@/assets/case-study-2.jpg";
 import caseImg3 from "@/assets/case-study-3.jpg";
 
 const cases = [
   {
-    type: "ERP System",
-    industry: "Retail / Multi-branch",
-    region: "Southeast Asia",
-    result: "Reduced inventory discrepancy from 23% to 1.4% in 90 days",
-    metrics: ["47 store locations", "8-week delivery", "3 custom integrations"],
-    stack: "Next.js · PostgreSQL · AWS",
+    type: "Retail ERP",
+    industry: "Multi-Branch Retail Chain",
+    region: "Southeast Asia · 47 Locations",
+    result: "Reduced inventory discrepancy from 23% to 1.4% — saving $340K annually in lost stock.",
+    metrics: ["47 store locations synced", "8-week delivery", "94% code coverage"],
+    agentStats: { agents: 12, tests: 847, automation: "91%" },
+    stack: "React · PostgreSQL · AWS · Agent Swarm v2",
     image: caseImg1,
   },
   {
-    type: "POS System",
-    industry: "F&B / Restaurant Group",
-    region: "Indonesia",
-    result: "Eliminated $14,000/year in third-party POS subscription fees",
-    metrics: ["12 outlets", "5-week delivery", "Offline-first architecture"],
-    stack: "React · Node.js · SQLite",
+    type: "Offline POS",
+    industry: "Restaurant Group",
+    region: "Indonesia · 12 Outlets",
+    result: "Eliminated $14,000/year in SaaS fees. System works offline — zero downtime during outages.",
+    metrics: ["12 outlets live", "5-week delivery", "Offline-first architecture"],
+    agentStats: { agents: 8, tests: 523, automation: "88%" },
+    stack: "React · Node.js · SQLite · Builder Swarm",
     image: caseImg2,
   },
   {
-    type: "Commercial SaaS",
-    industry: "Logistics / Supply Chain",
-    region: "Global (5 countries)",
-    result: "Launched MVP in 6 weeks. Reached $40K MRR in 4 months.",
-    metrics: ["3 pricing tiers", "Multi-tenant", "Stripe billing"],
-    stack: "Next.js · FastAPI · Stripe · AWS",
+    type: "Logistics SaaS",
+    industry: "Supply Chain Platform",
+    region: "Global · 5 Countries",
+    result: "Launched MVP in 6 weeks. Reached $40K MRR in 4 months. Now serving 200+ enterprise clients.",
+    metrics: ["Multi-tenant architecture", "3 pricing tiers", "Stripe billing"],
+    agentStats: { agents: 16, tests: 1243, automation: "94%" },
+    stack: "Next.js · FastAPI · Stripe · Agent Fleet",
     image: caseImg3,
   },
 ];
@@ -50,7 +53,7 @@ export function CaseStudies() {
           <div>
             <span className="reveal-line !mx-0 !ml-0" />
             <h2 className="text-3xl md:text-5xl font-display font-bold mb-4">Proven Results</h2>
-            <p className="text-lg text-muted-foreground">Real systems built for complex operations.</p>
+            <p className="text-lg text-muted-foreground">Real systems. Real ROI. Agent-powered from architecture to deployment.</p>
           </div>
           <motion.a
             href="#contact"
@@ -88,8 +91,16 @@ export function CaseStudies() {
               <h3 className="text-xl font-display font-bold mb-1">{c.industry}</h3>
               <div className="text-xs text-muted-foreground mb-5">{c.region}</div>
 
-              <div className="bg-primary/10 border border-primary/20 rounded-xl p-5 mb-6 flex-1 group-hover:bg-primary/15 transition-colors duration-500">
+              <div className="bg-primary/10 border border-primary/20 rounded-xl p-5 mb-4 flex-1 group-hover:bg-primary/15 transition-colors duration-500">
                 <p className="text-sm font-medium text-foreground leading-relaxed">"{c.result}"</p>
+              </div>
+
+              {/* Agent metrics badge */}
+              <div className="flex items-center gap-2 mb-4 p-3 rounded-lg bg-secondary/50 border border-border">
+                <Bot size={14} className="text-primary shrink-0" />
+                <span className="text-xs text-muted-foreground">
+                  {c.agentStats.agents} agents · {c.agentStats.tests} tests · {c.agentStats.automation} automated
+                </span>
               </div>
 
               <ul className="space-y-2 mb-6">

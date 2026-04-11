@@ -1,14 +1,15 @@
 import { Navbar } from "@/components/landing/Navbar";
 import { Hero } from "@/components/landing/Hero";
-import { Marquee } from "@/components/landing/Marquee";
+import { TechPartners } from "@/components/landing/Marquee";
 import { Problem } from "@/components/landing/Problem";
-import { AIAdvantage } from "@/components/landing/AIAdvantage";
+import { AgentStack } from "@/components/landing/AgentStack";
 import { Services } from "@/components/landing/Services";
 import { HowItWorks } from "@/components/landing/HowItWorks";
 import { ComparisonTable } from "@/components/landing/ComparisonTable";
 import { CaseStudies } from "@/components/landing/CaseStudies";
 import { Testimonials } from "@/components/landing/Testimonials";
 import { Pricing } from "@/components/landing/Pricing";
+import { SecurityBadge } from "@/components/landing/SecurityBadge";
 import { FAQ } from "@/components/landing/FAQ";
 import { LeadForm } from "@/components/landing/LeadForm";
 import { Footer } from "@/components/landing/Footer";
@@ -19,15 +20,16 @@ const Index = () => {
       <Navbar />
       <main>
         <Hero />
-        <Marquee />
+        <TechPartners />
         <Problem />
-        <AIAdvantage />
+        <AgentStack />
         <Services />
         <HowItWorks />
         <ComparisonTable />
         <CaseStudies />
         <Testimonials />
         <Pricing />
+        <SecurityBadge />
         <FAQ />
         <LeadForm />
       </main>
