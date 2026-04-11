@@ -125,5 +125,27 @@ export function useWorkflowOrchestra() {
     }
   }, [workflow?.id]);
 
-  return { workflow, isProcessing, error, startWorkflow, advanceWorkflow, sendOverride, setWorkflow };
+  const sendNegotiationMessage = useCallback(async (message: string) => {
+    if (!workflow?.id) return null;
+    setIsProcessing(true);
+    setError(null);
+    try {
+      const result = await callOrchestra({
+        action: "negotiate",
+        workflow_id: workflow.id,
+        negotiation_message: message,
+      });
+      // Refresh full state
+      const status = await callOrchestra({ action: "status", workflow_id: workflow.id });
+      setWorkflow(status);
+      return result;
+    } catch (e: any) {
+      setError(e.message);
+      throw e;
+    } finally {
+      setIsProcessing(false);
+    }
+  }, [workflow?.id]);
+
+  return { workflow, isProcessing, error, startWorkflow, advanceWorkflow, sendOverride, sendNegotiationMessage, setWorkflow };
 }
