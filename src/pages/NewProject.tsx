@@ -1,6 +1,7 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
+import { NegotiationChat } from "@/components/dashboard/NegotiationChat";
 import { useAuth } from "@/hooks/useAuth";
 import { useAgentChat } from "@/hooks/useAgentChat";
 import { useWorkflowOrchestra, WorkflowStatus } from "@/hooks/useWorkflowOrchestra";
@@ -40,7 +41,7 @@ export default function NewProject() {
 
   const currentAgent = WIZARD_STEPS[step].agent;
   const { messages, isLoading, send, reset } = useAgentChat(currentAgent);
-  const { workflow, isProcessing, startWorkflow, advanceWorkflow } = useWorkflowOrchestra();
+  const { workflow, isProcessing, startWorkflow, advanceWorkflow, sendNegotiationMessage } = useWorkflowOrchestra();
 
   useEffect(() => {
     chatRef.current?.scrollTo({ top: chatRef.current.scrollHeight, behavior: "smooth" });
@@ -77,18 +78,30 @@ export default function NewProject() {
         );
       }, 300);
     } else {
-      // Final step — show pipeline view
+      // Final step — show pipeline view and advance to negotiating
       setShowPipeline(true);
       if (workflow?.id) advanceWorkflow().catch(console.error);
     }
   };
 
+  const handleNegotiationMessage = useCallback(async (message: string) => {
+    if (!workflow?.id) return;
+    await sendNegotiationMessage(message);
+  }, [workflow?.id, sendNegotiationMessage]);
+
+  const handleAdvanceAfterDeal = useCallback(async () => {
+    if (!workflow?.id) return;
+    await advanceWorkflow();
+  }, [workflow?.id, advanceWorkflow]);
+
   const currentStatusIdx = workflow ? STATUS_ORDER.indexOf(workflow.current_status) : -1;
+  const isNegotiating = workflow?.current_status === "negotiating";
+  const dealAgreed = workflow?.current_status === "paid" && !!workflow?.final_agreed_quote;
 
   if (showPipeline && workflow) {
     return (
       <DashboardLayout>
-        <div className="max-w-4xl mx-auto space-y-6">
+        <div className="max-w-5xl mx-auto space-y-6">
           <h1 className="text-2xl font-display font-bold">Orchestration Pipeline</h1>
           <p className="text-muted-foreground text-sm">Your project is being processed by the AI Agent Orchestra</p>
 
@@ -117,55 +130,71 @@ export default function NewProject() {
             })}
           </div>
 
-          {/* Output cards */}
-          <div className="grid md:grid-cols-2 gap-4">
-            {workflow.planner_output && (
-              <Card className="glass-card">
-                <CardContent className="p-4">
-                  <h3 className="font-display font-bold text-sm mb-2 flex items-center gap-2">
-                    <Brain size={14} className="text-primary" /> Planner Output
-                  </h3>
-                  <pre className="text-xs text-muted-foreground overflow-auto max-h-48">
-                    {JSON.stringify(workflow.planner_output, null, 2)}
-                  </pre>
-                </CardContent>
-              </Card>
-            )}
-            {workflow.architecture_json && (
-              <Card className="glass-card">
-                <CardContent className="p-4">
-                  <h3 className="font-display font-bold text-sm mb-2 flex items-center gap-2">
-                    <Code size={14} className="text-primary" /> Architecture
-                  </h3>
-                  <pre className="text-xs text-muted-foreground overflow-auto max-h-48">
-                    {JSON.stringify(workflow.architecture_json, null, 2)}
-                  </pre>
-                </CardContent>
-              </Card>
-            )}
-            {workflow.quote_data && (
-              <Card className="glass-card col-span-full">
-                <CardContent className="p-4">
-                  <h3 className="font-display font-bold text-sm mb-2 flex items-center gap-2">
-                    <Calculator size={14} className="text-primary" /> Quote
-                  </h3>
-                  <pre className="text-xs text-muted-foreground overflow-auto max-h-48">
-                    {JSON.stringify(workflow.quote_data, null, 2)}
-                  </pre>
-                </CardContent>
-              </Card>
-            )}
-          </div>
+          {/* Negotiation Chat UI — shown during negotiating phase */}
+          {(isNegotiating || dealAgreed) && (
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+              <NegotiationChat
+                negotiationHistory={workflow.negotiation_history || []}
+                quoteData={workflow.quote_data}
+                isProcessing={isProcessing}
+                dealAgreed={dealAgreed}
+                onSendMessage={handleNegotiationMessage}
+                onAdvancePipeline={handleAdvanceAfterDeal}
+              />
+            </motion.div>
+          )}
+
+          {/* Output cards — shown when NOT negotiating */}
+          {!isNegotiating && !dealAgreed && (
+            <div className="grid md:grid-cols-2 gap-4">
+              {workflow.planner_output && (
+                <Card className="glass-card">
+                  <CardContent className="p-4">
+                    <h3 className="font-display font-bold text-sm mb-2 flex items-center gap-2">
+                      <Brain size={14} className="text-primary" /> Planner Output
+                    </h3>
+                    <pre className="text-xs text-muted-foreground overflow-auto max-h-48">
+                      {JSON.stringify(workflow.planner_output, null, 2)}
+                    </pre>
+                  </CardContent>
+                </Card>
+              )}
+              {workflow.architecture_json && (
+                <Card className="glass-card">
+                  <CardContent className="p-4">
+                    <h3 className="font-display font-bold text-sm mb-2 flex items-center gap-2">
+                      <Code size={14} className="text-primary" /> Architecture
+                    </h3>
+                    <pre className="text-xs text-muted-foreground overflow-auto max-h-48">
+                      {JSON.stringify(workflow.architecture_json, null, 2)}
+                    </pre>
+                  </CardContent>
+                </Card>
+              )}
+              {workflow.quote_data && (
+                <Card className="glass-card col-span-full">
+                  <CardContent className="p-4">
+                    <h3 className="font-display font-bold text-sm mb-2 flex items-center gap-2">
+                      <Calculator size={14} className="text-primary" /> Quote
+                    </h3>
+                    <pre className="text-xs text-muted-foreground overflow-auto max-h-48">
+                      {JSON.stringify(workflow.quote_data, null, 2)}
+                    </pre>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          )}
 
           {/* Metadata */}
-          <div className="flex gap-4 text-sm">
+          <div className="flex gap-4 text-sm flex-wrap">
             <Badge variant="secondary">Timeline: {workflow.metadata?.timeline_days || "—"} days</Badge>
             <Badge variant="secondary">Projected ROI: ${(workflow.metadata?.projected_roi || 0).toLocaleString()}</Badge>
             <Badge variant="secondary">Agent Minutes: {workflow.metadata?.total_agent_minutes || 0}</Badge>
           </div>
 
-          {/* Advance button */}
-          {!["live", "optimizing", "paused", "shutdown"].includes(workflow.current_status) && (
+          {/* Advance button — only for non-negotiation, non-terminal states */}
+          {!isNegotiating && !dealAgreed && !["live", "optimizing", "paused", "shutdown"].includes(workflow.current_status) && (
             <Button onClick={() => advanceWorkflow()} disabled={isProcessing} className="gap-2">
               {isProcessing ? <Loader2 size={14} className="animate-spin" /> : <ArrowRight size={14} />}
               Advance Pipeline
@@ -297,6 +326,7 @@ export default function NewProject() {
             placeholder={step === 0 ? "Describe your business problem..." : "Ask a follow-up question..."}
             className="flex-1 bg-secondary/60 border border-border rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-all"
             disabled={isLoading}
+            maxLength={5000}
           />
           <Button onClick={handleSend} disabled={isLoading || !input.trim()} className="rounded-xl px-4">
             <Send size={16} />
