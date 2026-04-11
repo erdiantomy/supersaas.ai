@@ -485,6 +485,84 @@ export type Database = {
         }
         Relationships: []
       }
+      workflow_runs: {
+        Row: {
+          architecture_json: Json | null
+          client_id: string | null
+          created_at: string
+          current_status: string
+          final_agreed_quote: Json | null
+          generated_code_bundle: string | null
+          id: string
+          live_app_url: string | null
+          metadata: Json | null
+          negotiation_history: Json | null
+          planner_output: Json | null
+          project_id: string | null
+          quote_data: Json | null
+          raw_client_prompt: string
+          stripe_session_id: string | null
+          super_admin_override: Json | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          architecture_json?: Json | null
+          client_id?: string | null
+          created_at?: string
+          current_status?: string
+          final_agreed_quote?: Json | null
+          generated_code_bundle?: string | null
+          id?: string
+          live_app_url?: string | null
+          metadata?: Json | null
+          negotiation_history?: Json | null
+          planner_output?: Json | null
+          project_id?: string | null
+          quote_data?: Json | null
+          raw_client_prompt?: string
+          stripe_session_id?: string | null
+          super_admin_override?: Json | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          architecture_json?: Json | null
+          client_id?: string | null
+          created_at?: string
+          current_status?: string
+          final_agreed_quote?: Json | null
+          generated_code_bundle?: string | null
+          id?: string
+          live_app_url?: string | null
+          metadata?: Json | null
+          negotiation_history?: Json | null
+          planner_output?: Json | null
+          project_id?: string | null
+          quote_data?: Json | null
+          raw_client_prompt?: string
+          stripe_session_id?: string | null
+          super_admin_override?: Json | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workflow_runs_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workflow_runs_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
