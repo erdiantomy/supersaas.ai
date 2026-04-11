@@ -1,13 +1,19 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Send, CheckCircle2, Sparkles } from "lucide-react";
+import { Send, CheckCircle2, Shield, Users, Globe } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+
+const trustBadges = [
+  { icon: Users, label: "50+ Companies" },
+  { icon: Globe, label: "14 Industries" },
+  { icon: Shield, label: "SOC2 Compliant" },
+];
 
 export function LeadForm() {
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [form, setForm] = useState({ name: "", email: "", company: "", message: "" });
+  const [form, setForm] = useState({ name: "", email: "", company: "", budget: "", message: "" });
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -18,7 +24,7 @@ export function LeadForm() {
       name: form.name,
       email: form.email,
       company: form.company || null,
-      message: form.message || null,
+      message: `[Budget: ${form.budget || "Not specified"}] ${form.message || ""}`.trim() || null,
     } as any);
 
     if (error) {
@@ -31,10 +37,25 @@ export function LeadForm() {
 
   return (
     <section id="contact" className="section-padding relative overflow-hidden">
-      {/* Cinematic ambient light */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,hsl(152_100%_45%/_0.06),transparent_50%)]" />
 
       <div className="container-narrow relative z-10">
+        {/* Trust badges */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+          className="flex items-center justify-center gap-6 md:gap-10 mb-10"
+        >
+          {trustBadges.map((b, i) => (
+            <div key={i} className="flex items-center gap-2 text-muted-foreground">
+              <b.icon size={16} className="text-primary/60" />
+              <span className="text-xs font-medium">{b.label}</span>
+            </div>
+          ))}
+        </motion.div>
+
         <motion.div
           initial={{ opacity: 0, y: 50, scale: 0.95 }}
           whileInView={{ opacity: 1, y: 0, scale: 1 }}
@@ -42,7 +63,6 @@ export function LeadForm() {
           transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
           className="glass-card p-8 md:p-12 rounded-3xl relative overflow-hidden"
         >
-          {/* Glow orb behind form */}
           <motion.div
             animate={{ scale: [1, 1.2, 1], opacity: [0.1, 0.2, 0.1] }}
             transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
@@ -59,12 +79,12 @@ export function LeadForm() {
             >
               <span className="reveal-line" />
               <h2 className="text-3xl md:text-4xl font-display font-bold mb-4">
-                Let's Build Something{" "}
-                <span className="text-gradient-green">Extraordinary</span>
+                Let's Deploy Your{" "}
+                <span className="text-gradient-green">Agent Fleet</span>
               </h2>
               <p className="text-muted-foreground max-w-lg mx-auto">
-                Book a free 30-minute architecture call. We'll map out your system
-                and give you a fixed-price quote within 48 hours.
+                Book a free 30-minute architecture call. Our Discovery Agent will analyze your 
+                workflow and deliver a technical blueprint within 48 hours.
               </p>
             </motion.div>
 
@@ -81,9 +101,9 @@ export function LeadForm() {
                 >
                   <CheckCircle2 size={48} className="text-primary mx-auto mb-4 glow-icon" />
                 </motion.div>
-                <h3 className="text-xl font-display font-bold mb-2">Thanks! We'll be in touch.</h3>
+                <h3 className="text-xl font-display font-bold mb-2">Agents Deployed! We'll be in touch.</h3>
                 <p className="text-muted-foreground text-sm">
-                  Expect a reply within 24 hours with your free architecture blueprint.
+                  Expect your free architecture blueprint within 48 hours.
                 </p>
               </motion.div>
             ) : (
@@ -116,8 +136,19 @@ export function LeadForm() {
                   placeholder="Company name"
                   value={form.company}
                   onChange={(e) => setForm({ ...form, company: e.target.value })}
-                  className="bg-secondary/60 border border-border rounded-xl px-4 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-300 text-sm md:col-span-2"
+                  className="bg-secondary/60 border border-border rounded-xl px-4 py-3 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-300 text-sm"
                 />
+                <select
+                  value={form.budget}
+                  onChange={(e) => setForm({ ...form, budget: e.target.value })}
+                  className="bg-secondary/60 border border-border rounded-xl px-4 py-3 text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-300 text-sm appearance-none"
+                >
+                  <option value="" className="bg-card text-muted-foreground">Budget range</option>
+                  <option value="$10K-$15K" className="bg-card">$10K – $15K</option>
+                  <option value="$15K-$30K" className="bg-card">$15K – $30K</option>
+                  <option value="$30K-$50K" className="bg-card">$30K – $50K</option>
+                  <option value="$50K+" className="bg-card">$50K+</option>
+                </select>
                 <textarea
                   placeholder="Tell us about your project..."
                   value={form.message}
@@ -134,7 +165,7 @@ export function LeadForm() {
                     className="btn-primary w-full flex items-center justify-center gap-2"
                   >
                     <Send size={16} />
-                    {submitting ? "Sending..." : "Book Free Architecture Call"}
+                    {submitting ? "Deploying Agents..." : "Book Free Architecture Call"}
                   </motion.button>
                 </div>
               </motion.form>

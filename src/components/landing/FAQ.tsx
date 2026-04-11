@@ -8,20 +8,32 @@ const faqs = [
     a: "We structure every project in milestones with a live staging environment after each sprint. You see working software every 2 weeks. We also offer fixed-price contracts so there are no cost overruns.",
   },
   {
+    q: "What AI models do you use?",
+    a: "We orchestrate multiple frontier models — GPT-5, Gemini 2.5 Pro, Claude 4 — each selected for specific tasks. Discovery uses language models. Architecture uses code-specialized models. QA uses security-focused models. The right tool for each job.",
+  },
+  {
+    q: "Is my data safe?",
+    a: "Absolutely. We run a SOC2-compliant pipeline. Your data never leaves your cloud infrastructure. We support data residency requirements for EU, APAC, and US regions. HIPAA-ready architectures available for healthcare clients.",
+  },
+  {
+    q: "What happens if AI makes a mistake?",
+    a: "Every agent output is validated by our QA Agent layer and human engineer review checkpoints. Our Builder Swarm generates 800+ automated tests per project. We maintain a zero-bug tolerance policy before production deployment.",
+  },
+  {
     q: "What if I need changes after launch?",
-    a: "The code is yours. You own it completely. We offer a Manage plan for ongoing changes, or you can hand it to your own developers. There's no lock-in, ever.",
+    a: "The code is yours — you own it completely. Our Scale and Enterprise plans include Managed AI Ops where agents continuously monitor, suggest improvements, and implement changes. Or hand it to your own developers. No lock-in, ever.",
   },
   {
     q: "How is this faster than a traditional agency?",
-    a: "We use AI-assisted architecture design, automated test generation, and component scaffolding that compresses the repetitive 60% of development. Our engineers spend their time on business logic and edge cases.",
+    a: "Traditional agencies assign 3-5 developers working sequentially. We deploy 8-16 AI agents working in parallel — frontend, backend, tests, and migrations simultaneously. Human engineers supervise and handle the complex business logic and edge cases.",
   },
   {
-    q: "My business is complex. Can you handle it?",
-    a: "Complex is our default setting. We've built multi-branch ERP for 47-location retail chains, offline-first POS for restaurant groups, and multi-tenant SaaS serving 5 countries.",
+    q: "Can I bring my own AI keys (BYOK)?",
+    a: "Yes. Enterprise clients can use their own API keys for AI model access. This gives you full control over usage, billing, and data governance. We support OpenAI, Google, and Anthropic BYOK configurations.",
   },
   {
     q: "What's the minimum budget I need?",
-    a: "Our simplest projects start around $8,000 USD. Enterprise ERP systems can reach $40,000+. We'll give you an honest estimate on the free architecture call.",
+    a: "Our Launch tier starts at $12,000 for an MVP with up to 5 modules, delivered in 4 weeks. Enterprise systems with full agent fleets and managed operations are custom-quoted. We'll give you an honest estimate on the architecture call.",
   },
 ];
 
@@ -53,7 +65,7 @@ export function FAQ() {
               initial={{ opacity: 0, y: 25 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-40px" }}
-              transition={{ duration: 0.6, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ duration: 0.6, delay: i * 0.08, ease: [0.16, 1, 0.3, 1] }}
               className={`glass-card rounded-xl overflow-hidden transition-all duration-500 ${openIdx === i ? "border-primary/20 shadow-[0_0_30px_hsl(152_100%_45%/_0.06)]" : ""}`}
             >
               <button

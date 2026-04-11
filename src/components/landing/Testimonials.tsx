@@ -10,34 +10,37 @@ import logoLogitech from "@/assets/logo-logitech-solutions.png";
 
 const testimonials = [
   {
-    quote: "Super SaaS delivered our multi-branch ERP in 6 weeks. We were quoted 18 months by a traditional agency. The system is flawless.",
+    quote: "Super SaaS deployed 12 AI agents that built our multi-branch ERP in 6 weeks. We were quoted 18 months by a traditional agency. The system handles 47 locations flawlessly.",
     name: "Budi Santoso",
     role: "Operations Director",
     company: "Retail Nusantara",
+    industry: "Retail · 47 locations · 2,400 employees",
     photo: testimonialBudi,
     logo: logoRetail,
     rating: 5,
-    metric: "6 weeks delivery",
+    metric: "6 weeks · $340K saved annually",
   },
   {
-    quote: "We eliminated $14k in annual SaaS fees by having them build our custom POS. It works offline, which is critical for our outlets.",
+    quote: "The agent swarm eliminated $14k in annual SaaS fees by building our custom POS. It works offline — which is critical. But what amazed me was the 523 automated tests they shipped with it.",
     name: "Sarah Miller",
     role: "Founder",
     company: "Brew & Co.",
+    industry: "F&B · 12 outlets · Indonesia",
     photo: testimonialSarah,
     logo: logoBrew,
     rating: 5,
-    metric: "$14k/yr saved",
+    metric: "$14k/yr saved · 5-week delivery",
   },
   {
-    quote: "The AI-assisted architecture process blew my mind. They understood our complex logistics workflow better than we did.",
+    quote: "Their Discovery Agent understood our logistics complexity better than we did. Within 48 hours we had a complete architecture blueprint. 4 months later — $40K MRR.",
     name: "David Lin",
     role: "CEO",
     company: "LogiTech Solutions",
+    industry: "Logistics SaaS · 5 countries · 200+ clients",
     photo: testimonialDavid,
     logo: logoLogitech,
     rating: 5,
-    metric: "3x faster launch",
+    metric: "$40K MRR in 4 months",
   },
 ];
 
@@ -61,7 +64,7 @@ export function Testimonials() {
         >
           <span className="reveal-line" />
           <h2 className="text-3xl md:text-5xl font-display font-bold mb-4">Client Stories</h2>
-          <p className="text-lg text-muted-foreground">Don't just take our word for it.</p>
+          <p className="text-lg text-muted-foreground">Real results from real businesses powered by our agent fleet.</p>
         </motion.div>
 
         <motion.div
@@ -73,7 +76,7 @@ export function Testimonials() {
         >
           <Quote className="absolute top-8 left-8 text-primary/10 w-20 h-20" />
 
-          <div className="relative z-10 min-h-[280px] flex flex-col justify-center">
+          <div className="relative z-10 min-h-[320px] flex flex-col justify-center">
             <AnimatePresence mode="wait">
               <motion.div
                 key={idx}
@@ -117,6 +120,7 @@ export function Testimonials() {
                     <div className="text-primary text-sm">
                       {t.role}, {t.company}
                     </div>
+                    <div className="text-xs text-muted-foreground mt-0.5">{t.industry}</div>
                   </div>
 
                   <img

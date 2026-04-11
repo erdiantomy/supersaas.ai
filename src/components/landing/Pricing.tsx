@@ -3,45 +3,51 @@ import { Check, ArrowRight } from "lucide-react";
 
 const plans = [
   {
-    name: "Starter",
-    price: "$8K",
-    desc: "Perfect for MVPs and internal tools",
+    name: "Launch",
+    price: "$12K",
+    priceDetail: "one-time",
+    desc: "MVP with agent-built foundation. Go from idea to live product in 4 weeks.",
     features: [
       "Up to 5 core modules",
-      "Basic integrations",
-      "4-week delivery",
+      "4 AI agents deployed",
+      "4-week delivery guarantee",
+      "Full source code & IP ownership",
       "3 months bug support",
-      "Full source code ownership",
+      "Live staging environment",
     ],
-    cta: "Get Started",
+    cta: "Start Building",
     featured: false,
   },
   {
-    name: "Growth",
-    price: "$18K",
-    desc: "For scaling businesses with complex workflows",
+    name: "Scale",
+    price: "$25K",
+    priceDetail: "+ $2K/mo managed",
+    desc: "Full enterprise system with autonomous monitoring and continuous AI optimization.",
     features: [
-      "Up to 15 modules",
-      "AI-assisted architecture",
-      "Custom integrations",
-      "6-week delivery",
+      "Up to 20 modules",
+      "Full agent swarm (12+ agents)",
+      "6-week delivery guarantee",
+      "AI monitoring & auto-alerting",
+      "Continuous optimization by agents",
       "6 months priority support",
-      "Performance optimization",
+      "Performance benchmarking",
     ],
     cta: "Book Architecture Call",
     featured: true,
   },
   {
     name: "Enterprise",
-    price: "$35K+",
-    desc: "Multi-branch ERP and enterprise SaaS",
+    price: "Custom",
+    priceDetail: "dedicated agent fleet",
+    desc: "Dedicated agent fleet with SLA, on-prem options, and 24/7 managed AI operations.",
     features: [
-      "Unlimited modules",
-      "Multi-tenant / multi-branch",
-      "Dedicated project manager",
-      "12-week delivery",
+      "Unlimited modules & integrations",
+      "Dedicated agent fleet",
+      "On-premise deployment option",
+      "SLA with 99.9% uptime guarantee",
+      "24/7 managed AI operations",
       "12 months premium support",
-      "SLA guarantee",
+      "HIPAA / SOC2 compliance ready",
     ],
     cta: "Contact Us",
     featured: false,
@@ -63,10 +69,10 @@ export function Pricing() {
         >
           <span className="reveal-line" />
           <h2 className="text-3xl md:text-5xl font-display font-bold mb-6">
-            Transparent Pricing
+            Invest Once. Own Forever.
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Fixed-price. No hourly billing. No surprises. You pay once and own it forever.
+            Fixed-price builds with optional managed AI operations. No hourly billing. No surprises.
           </p>
         </motion.div>
 
@@ -102,7 +108,7 @@ export function Pricing() {
                 <p className="text-sm text-muted-foreground mb-4">{plan.desc}</p>
                 <div className="text-4xl font-display font-bold text-foreground">
                   {plan.price}
-                  <span className="text-sm text-muted-foreground font-normal ml-1">one-time</span>
+                  <span className="text-sm text-muted-foreground font-normal ml-1">{plan.priceDetail}</span>
                 </div>
               </div>
 
