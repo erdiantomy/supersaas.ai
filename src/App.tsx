@@ -7,6 +7,7 @@ import { AuthProvider } from "@/hooks/useAuth";
 import Index from "./pages/Index.tsx";
 import Auth from "./pages/Auth.tsx";
 import Dashboard from "./pages/Dashboard.tsx";
+import AdminOverview from "./pages/AdminOverview.tsx";
 import DashboardClients from "./pages/DashboardClients.tsx";
 import DashboardProjects from "./pages/DashboardProjects.tsx";
 import DashboardMilestones from "./pages/DashboardMilestones.tsx";
@@ -15,6 +16,7 @@ import DashboardSubmissions from "./pages/DashboardSubmissions.tsx";
 import DashboardPayments from "./pages/DashboardPayments.tsx";
 import DashboardProjectDetail from "./pages/DashboardProjectDetail.tsx";
 import ClientPortal from "./pages/ClientPortal.tsx";
+import NewProject from "./pages/NewProject.tsx";
 import SubmitProject from "./pages/SubmitProject.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
@@ -30,7 +32,8 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
-            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/dashboard" element={<AdminOverview />} />
+            <Route path="/dashboard/legacy" element={<Dashboard />} />
             <Route path="/dashboard/clients" element={<DashboardClients />} />
             <Route path="/dashboard/projects" element={<DashboardProjects />} />
             <Route path="/dashboard/milestones" element={<DashboardMilestones />} />
@@ -39,6 +42,7 @@ const App = () => (
             <Route path="/dashboard/payments" element={<DashboardPayments />} />
             <Route path="/dashboard/project/:id" element={<DashboardProjectDetail />} />
             <Route path="/portal" element={<ClientPortal />} />
+            <Route path="/portal/new" element={<NewProject />} />
             <Route path="/portal/submit" element={<SubmitProject />} />
             <Route path="/portal/project/:id" element={<DashboardProjectDetail />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

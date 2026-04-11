@@ -1,12 +1,12 @@
 import { motion } from "framer-motion";
-import { Search, FileCode2, Rocket, ShieldCheck, Zap } from "lucide-react";
+import { Search, FileCode2, Rocket, ShieldCheck, Zap, MessageSquare } from "lucide-react";
 
 const steps = [
-  { icon: Search, num: "01", title: "Discovery Sprint", time: "Day 1–3", desc: "AI agents interview your team, analyze existing systems, and map every workflow. You get a complete requirements doc — automatically." },
-  { icon: FileCode2, num: "02", title: "Architecture in 48hrs", time: "Day 4–5", desc: "Agent-generated technical blueprint: database schemas, API contracts, UI wireframes — all reviewable and editable by your team." },
-  { icon: Rocket, num: "03", title: "Parallel Build", time: "Week 1–6", desc: "Agent swarm builds frontend, backend, and integrations simultaneously. You review on a live staging environment daily." },
-  { icon: ShieldCheck, num: "04", title: "AI QA & Hardening", time: "Week 5–7", desc: "Automated regression testing, security scanning, and performance benchmarking. Zero-bug tolerance before production." },
-  { icon: Zap, num: "05", title: "Deploy & Evolve", time: "Week 6–8", desc: "Go live with monitoring agents that detect issues and suggest improvements. Your system gets smarter post-launch." },
+  { icon: MessageSquare, num: "01", title: "Describe Your Problem", time: "5 minutes", desc: "Tell our AI what your business needs in plain English. No technical knowledge required. The Discovery Agent interviews you and maps every workflow." },
+  { icon: Search, num: "02", title: "AI Proposes Solution", time: "48 hours", desc: "The Architect Agent designs your complete system — schemas, APIs, UI, timeline, and pricing. All reviewable by you." },
+  { icon: FileCode2, num: "03", title: "Negotiate & Agree", time: "Real-time", desc: "Our Negotiation Agent handles scope, budget, and timeline discussions. Flexible, transparent, and always fair." },
+  { icon: Rocket, num: "04", title: "Agents Build It", time: "2–6 weeks", desc: "12+ AI agents build frontend, backend, tests, and integrations in parallel. You watch live progress daily." },
+  { icon: ShieldCheck, num: "05", title: "QA, Deploy & Evolve", time: "Continuous", desc: "AI QA agents test everything. One-click deploy. Post-launch monitoring agents keep your system evolving." },
 ];
 
 export function HowItWorks() {
@@ -23,9 +23,12 @@ export function HowItWorks() {
           className="text-center mb-16"
         >
           <span className="reveal-line" />
-          <h2 className="text-3xl md:text-5xl font-display font-bold mb-6">How Agents Build Your System</h2>
+          <h2 className="text-3xl md:text-5xl font-display font-bold mb-6">
+            Your Journey — 100% Autonomous
+          </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            A 5-phase autonomous pipeline. Transparent at every step. Human-reviewed at every checkpoint.
+            From "I have a business problem" to "My custom system is live" — 
+            entirely handled by AI agents. You just describe and approve.
           </p>
         </motion.div>
 
