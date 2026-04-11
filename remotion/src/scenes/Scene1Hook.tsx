@@ -1,33 +1,38 @@
-import { AbsoluteFill, useCurrentFrame, interpolate, spring, useVideoConfig } from "remotion";
+import { AbsoluteFill, useCurrentFrame, interpolate, spring, useVideoConfig, Img, staticFile } from "remotion";
 import { COLORS, FONTS } from "../styles";
 
 export const Scene1Hook: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
-  // "SUPER" reveal - per character
+  // Logo fade-in + scale
+  const logoOpacity = interpolate(frame, [0, 30], [0, 1], { extrapolateRight: "clamp" });
+  const logoScale = spring({ frame, fps, config: { damping: 15, stiffness: 60, mass: 1.8 } });
+
+  // Logo fade-out to make room for text
+  const logoFadeOut = interpolate(frame, [60, 80], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+
+  // Text reveals after logo
   const superText = "SUPERSAAS";
   const tagline = ".AI";
 
-  // Dramatic scale-in
-  const logoScale = spring({ frame, fps, config: { damping: 15, stiffness: 80, mass: 1.5 } });
-  const logoOpacity = interpolate(frame, [0, 15], [0, 1], { extrapolateRight: "clamp" });
+  const textOpacity = interpolate(frame, [70, 90], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
 
   // Tagline slides in
   const tagX = interpolate(
-    spring({ frame: frame - 25, fps, config: { damping: 20, stiffness: 200 } }),
+    spring({ frame: frame - 95, fps, config: { damping: 20, stiffness: 200 } }),
     [0, 1],
     [100, 0]
   );
-  const tagOpacity = interpolate(frame, [25, 40], [0, 1], { extrapolateRight: "clamp" });
+  const tagOpacity = interpolate(frame, [95, 110], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
 
   // Subtitle reveal
   const subY = interpolate(
-    spring({ frame: frame - 50, fps, config: { damping: 20, stiffness: 150 } }),
+    spring({ frame: frame - 105, fps, config: { damping: 20, stiffness: 150 } }),
     [0, 1],
     [60, 0]
   );
-  const subOpacity = interpolate(frame, [50, 70], [0, 1], { extrapolateRight: "clamp" });
+  const subOpacity = interpolate(frame, [105, 120], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
 
   // Stats stagger in
   const stats = [
@@ -39,13 +44,34 @@ export const Scene1Hook: React.FC = () => {
   // Glitch line
   const glitchOpacity = interpolate(
     frame,
-    [15, 16, 17, 18],
+    [75, 76, 77, 78],
     [0, 0.8, 0, 0.3],
     { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
   );
 
   return (
     <AbsoluteFill style={{ justifyContent: "center", alignItems: "center" }}>
+      {/* Logo intro */}
+      <div
+        style={{
+          position: "absolute",
+          opacity: logoOpacity * logoFadeOut,
+          transform: `scale(${interpolate(logoScale, [0, 1], [0.5, 1])})`,
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <Img
+          src={staticFile("images/logo.png")}
+          style={{
+            width: 500,
+            height: "auto",
+            filter: `drop-shadow(0 0 60px ${COLORS.primary}60)`,
+          }}
+        />
+      </div>
+
       {/* Horizontal glitch line */}
       <div
         style={{
@@ -60,19 +86,18 @@ export const Scene1Hook: React.FC = () => {
         }}
       />
 
-      {/* Main logo */}
+      {/* Main logo text */}
       <div
         style={{
           display: "flex",
           alignItems: "baseline",
-          opacity: logoOpacity,
-          transform: `scale(${logoScale})`,
+          opacity: textOpacity,
         }}
       >
         <div style={{ display: "flex" }}>
           {superText.split("").map((char, i) => {
             const charSpring = spring({
-              frame: frame - i * 2,
+              frame: frame - 75 - i * 2,
               fps,
               config: { damping: 12, stiffness: 200 },
             });
@@ -144,7 +169,7 @@ export const Scene1Hook: React.FC = () => {
       >
         {stats.map((s, i) => {
           const sSpring = spring({
-            frame: frame - 80 - i * 10,
+            frame: frame - 120 - i * 10,
             fps,
             config: { damping: 15, stiffness: 180 },
           });

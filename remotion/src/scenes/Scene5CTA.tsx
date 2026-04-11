@@ -1,9 +1,10 @@
-import { AbsoluteFill, useCurrentFrame, interpolate, spring, useVideoConfig } from "remotion";
+import { AbsoluteFill, useCurrentFrame, interpolate, spring, useVideoConfig, Img, staticFile } from "remotion";
 import { COLORS, FONTS } from "../styles";
 
 export const Scene5CTA: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
+  const duration = 170;
 
   // Dramatic scale reveal
   const mainSpring = spring({ frame, fps, config: { damping: 12, stiffness: 60, mass: 2 } });
@@ -17,6 +18,16 @@ export const Scene5CTA: React.FC = () => {
     { name: "Enterprise", price: "Custom", detail: "dedicated fleet", features: ["Unlimited", "On-premise", "99.9% SLA"] },
   ];
 
+  // Cards fade out before logo
+  const cardsFadeOut = interpolate(frame, [110, 130], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+
+  // Logo fade-in at the end
+  const logoOpacity = interpolate(frame, [120, 145], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+  const logoScale = spring({ frame: frame - 120, fps, config: { damping: 15, stiffness: 60, mass: 1.5 } });
+
+  // Final fade-out
+  const finalFade = interpolate(frame, [155, duration], [1, 0], { extrapolateLeft: "clamp", extrapolateRight: "clamp" });
+
   // Bottom tagline
   const tagSpring = spring({ frame: frame - 90, fps, config: { damping: 20, stiffness: 150 } });
   const tagY = interpolate(tagSpring, [0, 1], [40, 0]);
@@ -27,174 +38,133 @@ export const Scene5CTA: React.FC = () => {
 
   return (
     <AbsoluteFill style={{ justifyContent: "center", alignItems: "center" }}>
-      {/* Title */}
-      <div
-        style={{
-          textAlign: "center",
-          marginBottom: 60,
-          transform: `scale(${mainScale})`,
-          opacity: mainOp,
-        }}
-      >
+      {/* Price cards section */}
+      <div style={{ opacity: cardsFadeOut }}>
+        {/* Title */}
         <div
           style={{
-            fontFamily: FONTS.display,
-            fontSize: 64,
-            fontWeight: 700,
-            color: COLORS.white,
-            lineHeight: 1.15,
-            marginBottom: 16,
+            textAlign: "center",
+            marginBottom: 60,
+            transform: `scale(${mainScale})`,
+            opacity: mainOp,
           }}
         >
-          Start Building{" "}
-          <span
+          <div
             style={{
-              background: "linear-gradient(90deg, #00E676, #00BCD4)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
+              fontFamily: FONTS.display,
+              fontSize: 64,
+              fontWeight: 700,
+              color: COLORS.white,
+              lineHeight: 1.15,
+              marginBottom: 16,
             }}
           >
-            Today
-          </span>
-        </div>
-        <div
-          style={{
-            fontFamily: FONTS.body,
-            fontSize: 24,
-            color: COLORS.muted,
-          }}
-        >
-          Zero risk. Full ownership. AI-powered delivery.
-        </div>
-      </div>
-
-      {/* Price cards */}
-      <div style={{ display: "flex", gap: 32 }}>
-        {plans.map((plan, i) => {
-          const cardSpring = spring({
-            frame: frame - 30 - i * 12,
-            fps,
-            config: { damping: 16, stiffness: 140 },
-          });
-          const cardY = interpolate(cardSpring, [0, 1], [80, 0]);
-          const cardOp = interpolate(cardSpring, [0, 0.4], [0, 1], { extrapolateRight: "clamp" });
-
-          return (
-            <div
-              key={i}
+            Start Building{" "}
+            <span
               style={{
-                width: 320,
-                padding: "36px 32px",
-                background: plan.featured
-                  ? "rgba(0,230,118,0.06)"
-                  : "rgba(255,255,255,0.03)",
-                border: plan.featured
-                  ? `2px solid ${COLORS.primary}40`
-                  : "1px solid rgba(255,255,255,0.06)",
-                borderRadius: 20,
-                transform: `translateY(${cardY}px)`,
-                opacity: cardOp,
-                boxShadow: plan.featured
-                  ? `0 0 40px ${COLORS.primary}15`
-                  : "none",
+                background: "linear-gradient(90deg, #00E676, #00BCD4)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
               }}
             >
+              Today
+            </span>
+          </div>
+          <div
+            style={{
+              fontFamily: FONTS.body,
+              fontSize: 24,
+              color: COLORS.muted,
+            }}
+          >
+            Zero risk. Full ownership. AI-powered delivery.
+          </div>
+        </div>
+
+        {/* Price cards */}
+        <div style={{ display: "flex", gap: 32 }}>
+          {plans.map((plan, i) => {
+            const cardSpring = spring({
+              frame: frame - 30 - i * 12,
+              fps,
+              config: { damping: 16, stiffness: 140 },
+            });
+            const cardY = interpolate(cardSpring, [0, 1], [80, 0]);
+            const cardOp = interpolate(cardSpring, [0, 0.4], [0, 1], { extrapolateRight: "clamp" });
+
+            return (
               <div
+                key={i}
                 style={{
-                  fontFamily: FONTS.body,
-                  fontSize: 16,
-                  color: COLORS.muted,
-                  textTransform: "uppercase",
-                  letterSpacing: "0.15em",
-                  marginBottom: 12,
+                  width: 320,
+                  padding: "36px 32px",
+                  background: plan.featured
+                    ? "rgba(0,230,118,0.06)"
+                    : "rgba(255,255,255,0.03)",
+                  border: plan.featured
+                    ? `2px solid ${COLORS.primary}40`
+                    : "1px solid rgba(255,255,255,0.06)",
+                  borderRadius: 20,
+                  transform: `translateY(${cardY}px)`,
+                  opacity: cardOp,
+                  boxShadow: plan.featured
+                    ? `0 0 40px ${COLORS.primary}15`
+                    : "none",
                 }}
               >
-                {plan.name}
-              </div>
-              <div
-                style={{
-                  fontFamily: FONTS.display,
-                  fontSize: 48,
-                  fontWeight: 700,
-                  color: plan.featured ? COLORS.primary : COLORS.white,
-                  marginBottom: 4,
-                }}
-              >
-                {plan.price}
-              </div>
-              <div
-                style={{
-                  fontFamily: FONTS.body,
-                  fontSize: 14,
-                  color: COLORS.muted,
-                  marginBottom: 24,
-                }}
-              >
-                {plan.detail}
-              </div>
-              {plan.features.map((f, fi) => (
-                <div
-                  key={fi}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 10,
-                    marginBottom: 10,
-                  }}
-                >
-                  <div
-                    style={{
-                      width: 6,
-                      height: 6,
-                      borderRadius: "50%",
-                      background: plan.featured ? COLORS.primary : COLORS.muted,
-                    }}
-                  />
-                  <span
-                    style={{
-                      fontFamily: FONTS.body,
-                      fontSize: 15,
-                      color: COLORS.white,
-                    }}
-                  >
-                    {f}
-                  </span>
+                <div style={{ fontFamily: FONTS.body, fontSize: 16, color: COLORS.muted, textTransform: "uppercase", letterSpacing: "0.15em", marginBottom: 12 }}>
+                  {plan.name}
                 </div>
-              ))}
-            </div>
-          );
-        })}
+                <div style={{ fontFamily: FONTS.display, fontSize: 48, fontWeight: 700, color: plan.featured ? COLORS.primary : COLORS.white, marginBottom: 4 }}>
+                  {plan.price}
+                </div>
+                <div style={{ fontFamily: FONTS.body, fontSize: 14, color: COLORS.muted, marginBottom: 24 }}>
+                  {plan.detail}
+                </div>
+                {plan.features.map((f, fi) => (
+                  <div key={fi} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
+                    <div style={{ width: 6, height: 6, borderRadius: "50%", background: plan.featured ? COLORS.primary : COLORS.muted }} />
+                    <span style={{ fontFamily: FONTS.body, fontSize: 15, color: COLORS.white }}>{f}</span>
+                  </div>
+                ))}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Bottom tagline */}
+        <div style={{ marginTop: 60, textAlign: "center", transform: `translateY(${tagY}px)`, opacity: tagOp }}>
+          <div style={{ fontFamily: FONTS.display, fontSize: 28, fontWeight: 700, color: COLORS.primary, textShadow: `0 0 ${ctaGlow}px ${COLORS.primary}60` }}>
+            supersaas.ai
+          </div>
+          <div style={{ fontFamily: FONTS.body, fontSize: 18, color: COLORS.muted, marginTop: 8 }}>
+            The future of software is autonomous.
+          </div>
+        </div>
       </div>
 
-      {/* Bottom tagline */}
+      {/* Closing logo */}
       <div
         style={{
-          marginTop: 60,
-          textAlign: "center",
-          transform: `translateY(${tagY}px)`,
-          opacity: tagOp,
+          position: "absolute",
+          opacity: logoOpacity * finalFade,
+          transform: `scale(${interpolate(logoScale, [0, 1], [0.6, 1])})`,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: 30,
         }}
       >
-        <div
+        <Img
+          src={staticFile("images/logo.png")}
           style={{
-            fontFamily: FONTS.display,
-            fontSize: 28,
-            fontWeight: 700,
-            color: COLORS.primary,
-            textShadow: `0 0 ${ctaGlow}px ${COLORS.primary}60`,
+            width: 400,
+            height: "auto",
+            filter: `drop-shadow(0 0 80px ${COLORS.primary}50)`,
           }}
-        >
+        />
+        <div style={{ fontFamily: FONTS.display, fontSize: 36, fontWeight: 700, color: COLORS.muted, letterSpacing: "0.1em" }}>
           supersaas.ai
-        </div>
-        <div
-          style={{
-            fontFamily: FONTS.body,
-            fontSize: 18,
-            color: COLORS.muted,
-            marginTop: 8,
-          }}
-        >
-          The future of software is autonomous.
         </div>
       </div>
     </AbsoluteFill>
