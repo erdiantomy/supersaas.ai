@@ -18,6 +18,7 @@ import DashboardProjectDetail from "./pages/DashboardProjectDetail.tsx";
 import ClientPortal from "./pages/ClientPortal.tsx";
 import NewProject from "./pages/NewProject.tsx";
 import SubmitProject from "./pages/SubmitProject.tsx";
+import ManagedAgents from "./pages/ManagedAgents.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -40,6 +41,7 @@ const App = () => (
             <Route path="/dashboard/inquiries" element={<DashboardInquiries />} />
             <Route path="/dashboard/submissions" element={<DashboardSubmissions />} />
             <Route path="/dashboard/payments" element={<DashboardPayments />} />
+            <Route path="/dashboard/managed-agents" element={<ManagedAgents />} />
             <Route path="/dashboard/project/:id" element={<DashboardProjectDetail />} />
             <Route path="/portal" element={<ClientPortal />} />
             <Route path="/portal/new" element={<NewProject />} />

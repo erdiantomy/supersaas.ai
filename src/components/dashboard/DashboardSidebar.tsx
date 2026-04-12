@@ -1,4 +1,4 @@
-import { LayoutDashboard, Users, FolderKanban, Milestone, LogOut, Home, Inbox, FileText, DollarSign, Send, Bot, Sparkles } from "lucide-react";
+import { LayoutDashboard, Users, FolderKanban, Milestone, LogOut, Home, Inbox, FileText, DollarSign, Send, Bot, Sparkles, Cpu } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useAuth } from "@/hooks/useAuth";
 import {
@@ -21,6 +21,7 @@ const adminItems = [
   { title: "Projects", url: "/dashboard/projects", icon: FolderKanban },
   { title: "Milestones", url: "/dashboard/milestones", icon: Milestone },
   { title: "Payments", url: "/dashboard/payments", icon: DollarSign },
+  { title: "Managed Agents", url: "/dashboard/managed-agents", icon: Cpu },
 ];
 
 const clientItems = [
