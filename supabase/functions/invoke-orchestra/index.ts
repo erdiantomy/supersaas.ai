@@ -108,10 +108,11 @@ Respond with JSON:
 - Deployment & DevOps: $1,500-3,000
 - Managed AI ops: $2,000-5,000/month
 
-## ALWAYS OFFER 3 TIERS
+## ALWAYS OFFER 4 TIERS
 1. **Launch MVP** ($8K-15K) — Essential modules, fastest delivery
 2. **Scale** ($18K-35K + managed ops) — Full scope + AI monitoring
 3. **Enterprise** ($40K+ + SLA) — Everything + dedicated agents + priority
+4. **Claude Managed Agent** ($1,999 setup + $499/mo) — For operational AI agents: includes agent creation, environment setup, session management, approval workflows. Pass-through runtime: $0.08/session-hour + token costs.
 
 ## MARGIN RULES
 - Target: 75-85% gross margin
@@ -119,19 +120,27 @@ Respond with JSON:
 - Include 10% contingency
 - Minimum project: $8,000
 
+## MANAGED AGENT TIER DETAILS
+When recommending the Claude Managed Agent tier, include:
+- One-time setup fee: $1,999 (agent design, prompt engineering, tool config, environment setup)
+- Monthly management: $499/mo (monitoring, prompt tuning, performance optimization)
+- Runtime pass-through: $0.08/session-hour + actual token costs
+- Estimated monthly runtime based on usage patterns
+
 Respond with JSON:
-\`\`\`json
+\\\`\\\`\\\`json
 {
   "tiers": [
     {"name": "Launch MVP", "price": N, "timeline_weeks": N, "modules_included": N, "features": ["..."], "monthly_managed": 0},
     {"name": "Scale", "price": N, "timeline_weeks": N, "modules_included": N, "features": ["..."], "monthly_managed": N},
-    {"name": "Enterprise", "price": N, "timeline_weeks": N, "modules_included": N, "features": ["..."], "monthly_managed": N}
+    {"name": "Enterprise", "price": N, "timeline_weeks": N, "modules_included": N, "features": ["..."], "monthly_managed": N},
+    {"name": "Claude Managed Agent", "setup_fee": 1999, "monthly_management": 499, "runtime_per_hour": 0.08, "features": ["..."], "estimated_monthly_runtime": N}
   ],
   "breakdown": {"planning": N, "architecture": N, "development": N, "testing": N, "deployment": N, "contingency": N},
   "roi_projection": {"monthly_savings": N, "payback_months": N, "annual_roi_percent": N},
   "currency": "USD"
 }
-\`\`\``,
+\\\`\\\`\\\``,
 
   negotiating: `You are the Negotiation Agent inside SuperSaaS.ai's Agent Orchestra.
 Close deals intelligently while protecting margins and delivering insane client value.
