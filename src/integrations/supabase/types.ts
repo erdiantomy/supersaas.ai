@@ -171,6 +171,203 @@ export type Database = {
         }
         Relationships: []
       }
+      managed_agents: {
+        Row: {
+          anthropic_agent_id: string | null
+          created_at: string
+          id: string
+          metadata: Json | null
+          model: string
+          name: string
+          status: string
+          system_prompt: string | null
+          tools: Json
+          updated_at: string
+          user_id: string
+          version: number
+        }
+        Insert: {
+          anthropic_agent_id?: string | null
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          model?: string
+          name: string
+          status?: string
+          system_prompt?: string | null
+          tools?: Json
+          updated_at?: string
+          user_id: string
+          version?: number
+        }
+        Update: {
+          anthropic_agent_id?: string | null
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          model?: string
+          name?: string
+          status?: string
+          system_prompt?: string | null
+          tools?: Json
+          updated_at?: string
+          user_id?: string
+          version?: number
+        }
+        Relationships: []
+      }
+      managed_environments: {
+        Row: {
+          agent_id: string | null
+          anthropic_environment_id: string | null
+          config: Json | null
+          created_at: string
+          id: string
+          name: string
+          packages: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          agent_id?: string | null
+          anthropic_environment_id?: string | null
+          config?: Json | null
+          created_at?: string
+          id?: string
+          name?: string
+          packages?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          agent_id?: string | null
+          anthropic_environment_id?: string | null
+          config?: Json | null
+          created_at?: string
+          id?: string
+          name?: string
+          packages?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "managed_environments_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "managed_agents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      managed_events: {
+        Row: {
+          approval_status: string | null
+          created_at: string
+          event_data: Json
+          event_type: string
+          id: string
+          requires_approval: boolean
+          session_id: string
+        }
+        Insert: {
+          approval_status?: string | null
+          created_at?: string
+          event_data?: Json
+          event_type: string
+          id?: string
+          requires_approval?: boolean
+          session_id: string
+        }
+        Update: {
+          approval_status?: string | null
+          created_at?: string
+          event_data?: Json
+          event_type?: string
+          id?: string
+          requires_approval?: boolean
+          session_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "managed_events_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "managed_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      managed_sessions: {
+        Row: {
+          agent_id: string
+          anthropic_session_id: string | null
+          approval_mode: string
+          cost_data: Json | null
+          created_at: string
+          environment_id: string | null
+          id: string
+          last_event_at: string | null
+          metadata: Json | null
+          status: string
+          updated_at: string
+          user_id: string
+          workflow_run_id: string | null
+        }
+        Insert: {
+          agent_id: string
+          anthropic_session_id?: string | null
+          approval_mode?: string
+          cost_data?: Json | null
+          created_at?: string
+          environment_id?: string | null
+          id?: string
+          last_event_at?: string | null
+          metadata?: Json | null
+          status?: string
+          updated_at?: string
+          user_id: string
+          workflow_run_id?: string | null
+        }
+        Update: {
+          agent_id?: string
+          anthropic_session_id?: string | null
+          approval_mode?: string
+          cost_data?: Json | null
+          created_at?: string
+          environment_id?: string | null
+          id?: string
+          last_event_at?: string | null
+          metadata?: Json | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+          workflow_run_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "managed_sessions_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "managed_agents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "managed_sessions_environment_id_fkey"
+            columns: ["environment_id"]
+            isOneToOne: false
+            referencedRelation: "managed_environments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "managed_sessions_workflow_run_id_fkey"
+            columns: ["workflow_run_id"]
+            isOneToOne: false
+            referencedRelation: "workflow_runs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       milestones: {
         Row: {
           created_at: string
