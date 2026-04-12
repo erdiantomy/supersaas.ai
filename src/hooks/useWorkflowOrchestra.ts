@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 export type WorkflowStatus =
-  | "intake" | "planning" | "architecting" | "quoting" | "negotiating"
+  | "intake" | "planning" | "architecting" | "validating" | "quoting" | "negotiating"
   | "paid" | "building" | "testing" | "deploying" | "live" | "optimizing"
   | "paused" | "shutdown";
 
@@ -13,11 +13,18 @@ export interface WorkflowRun {
   client_id: string | null;
   current_status: WorkflowStatus;
   raw_client_prompt: string;
+  project_description: string;
+  client_name: string;
   planner_output: any;
   architecture_json: any;
   quote_data: any;
   negotiation_history: any[];
   final_agreed_quote: any;
+  agent_results: Record<string, any>;
+  status_history: any[];
+  deployment_type: string;
+  agent_native_score: any;
+  validation_passed: boolean | null;
   stripe_session_id: string | null;
   generated_code_bundle: string | null;
   live_app_url: string | null;
@@ -77,9 +84,14 @@ export function useWorkflowOrchestra() {
     setIsProcessing(true);
     setError(null);
     try {
-      const result = await callOrchestra({ action: "start", client_prompt: clientPrompt, user_id: userId });
+      const result = await callOrchestra({
+        action: "start",
+        project_description: clientPrompt,
+        client_name: "Client",
+        user_id: userId,
+      });
       // Fetch full state
-      const status = await callOrchestra({ action: "status", workflow_id: result.workflow_id });
+      const status = await callOrchestra({ action: "status", workflow_id: result.id });
       setWorkflow(status);
       return result;
     } catch (e: any) {

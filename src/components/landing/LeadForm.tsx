@@ -28,7 +28,7 @@ export function LeadForm() {
       email: form.email,
       company: form.company || null,
       message: `[Budget: ${form.budget || "Not specified"}] ${form.message || ""}`.trim() || null,
-    } as any);
+    });
 
     if (error) {
       console.error("Inquiry save error:", error);

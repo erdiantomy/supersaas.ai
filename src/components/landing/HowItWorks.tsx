@@ -3,10 +3,10 @@ import { Search, FileCode2, Rocket, ShieldCheck, Zap, MessageSquare } from "luci
 
 const steps = [
   { icon: MessageSquare, num: "01", title: "Describe Your Problem", time: "5 minutes", desc: "Tell our AI what your business needs in plain English. No technical knowledge required. The Discovery Agent interviews you and maps every workflow." },
-  { icon: Search, num: "02", title: "AI Proposes Solution", time: "48 hours", desc: "The Architect Agent designs your complete system — schemas, APIs, UI, timeline, and pricing. All reviewable by you." },
-  { icon: FileCode2, num: "03", title: "Negotiate & Agree", time: "Real-time", desc: "Our Negotiation Agent handles scope, budget, and timeline discussions. Flexible, transparent, and always fair." },
-  { icon: Rocket, num: "04", title: "Agents Build It", time: "2–6 weeks", desc: "12+ AI agents build frontend, backend, tests, and integrations in parallel. You watch live progress daily." },
-  { icon: ShieldCheck, num: "05", title: "QA, Deploy & Evolve", time: "Continuous", desc: "AI QA agents test everything. One-click deploy. Post-launch monitoring agents keep your system evolving." },
+  { icon: Search, num: "02", title: "Agent-Native Design", time: "48 hours", desc: "The Architect Agent designs your complete agent-native system — MCP server, tool parity matrix, sandbox config, and pricing. All reviewable by you." },
+  { icon: FileCode2, num: "03", title: "Negotiate & Agree", time: "Real-time", desc: "Our Negotiation Agent handles scope, budget, and timeline discussions. Agent-Native Rebuild tier recommended for maximum future-proofing." },
+  { icon: Rocket, num: "04", title: "Agents Build It", time: "2–6 weeks", desc: "12+ AI agents build MCP server, frontend, backend, agent tools, and tests in parallel. Every UI action gets a matching agent tool." },
+  { icon: ShieldCheck, num: "05", title: "Validate, Deploy & Self-Optimize", time: "Continuous", desc: "Agent-Native Validator scores your build across 6 dimensions. One-click deploy. Self-optimizing agents keep improving your system forever." },
 ];
 
 export function HowItWorks() {

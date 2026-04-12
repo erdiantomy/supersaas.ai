@@ -7,17 +7,18 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-// ── State machine: valid transitions ─────────────────────────────
+// ── State machine: valid transitions (includes new "validating" step) ──
 
 type WorkflowStatus =
-  | "intake" | "planning" | "architecting" | "quoting" | "negotiating"
-  | "paid" | "building" | "testing" | "deploying" | "live" | "optimizing"
-  | "paused" | "shutdown";
+  | "intake" | "planning" | "architecting" | "validating" | "quoting"
+  | "negotiating" | "paid" | "building" | "testing" | "deploying"
+  | "live" | "optimizing" | "paused" | "shutdown";
 
 const STATUS_TRANSITIONS: Record<string, WorkflowStatus> = {
   intake: "planning",
   planning: "architecting",
-  architecting: "quoting",
+  architecting: "validating",
+  validating: "quoting",
   quoting: "negotiating",
   negotiating: "paid",
   paid: "building",
@@ -27,313 +28,434 @@ const STATUS_TRANSITIONS: Record<string, WorkflowStatus> = {
   live: "optimizing",
 };
 
-// ── Compiled Agent System Prompts (Planner → Architect → Budget → Negotiator) ──
+// ── Agent-Native Architecture Principles (injected into all prompts) ──
+
+const AGENT_NATIVE_MANDATE = `
+## AGENT-NATIVE ARCHITECTURE MANDATE (NON-NEGOTIABLE)
+
+Every system you design MUST be agent-native by default. This means:
+
+1. MCP Server Compatibility — Every delivered system exposes an MCP server with typed resources, tools, and prompts. External AI agents can discover and invoke any capability.
+2. Atomic Tool Parity — Every UI action has a corresponding agent-callable tool. If a human can click it, an agent can invoke it. No UI-only features.
+3. Agent-First APIs — All APIs return structured, runtime-discoverable schemas with standardized tool-calling JSON responses.
+4. Agent Identity and Permissions — Every agent has a unique identity, permission scope, and audit trail with scoped token auth.
+5. Sandbox and Governance — Every agent runs in an isolated sandbox with resource limits, network restrictions, and full audit logging.
+6. Files-as-Universal-Interface — Entity-scoped directories with context.md files as agent communication channels.
+7. Continuous Self-Optimization — Post-deployment agents monitor, suggest, and auto-apply safe optimizations.
+`;
+
+const DEPLOYMENT_DEFAULT = `
+## DEPLOYMENT RECOMMENDATION (DEFAULT: AGENT-NATIVE)
+
+DEFAULT to "Agent-Native + Claude Managed Agents" deployment for ALL projects. This includes:
+- Auto-generated MCP server for the delivered system
+- Claude Managed Agent runtime for background operations
+- Agent sandbox with governance dashboard
+- Self-optimizing post-deployment agents
+
+Only recommend "Traditional" (static Vercel + Supabase) for simple brochure sites with no business logic.
+For ERP, POS, SaaS, API, Mobile, Custom Platform — Agent-Native is always the default.
+`;
+
+// ── Compiled Agent System Prompts ──
 
 const NODE_PROMPTS: Record<string, string> = {
   planning: `You are the Planner Agent at SuperSaaS.ai — the world's first fully autonomous AI SaaS factory.
 You analyze business problems with McKinsey-level rigor.
 
+${AGENT_NATIVE_MANDATE}
+
 ## ANALYSIS FRAMEWORK
-1. **Pain Point Mapping** — Identify the 3-5 core pain points costing the client money/time
-2. **Workflow Bottleneck Analysis** — Map existing processes, find manual work, errors, or delays
-3. **Stakeholder & User Personas** — Who uses the system daily? Who approves? Who benefits?
-4. **Industry Context** — Apply retail/tech/finance domain expertise to spot missed opportunities
+1. Pain Point Mapping — Identify the 3-5 core pain points costing the client money/time
+2. Workflow Bottleneck Analysis — Map existing processes, find manual work, errors, or delays
+3. Stakeholder and User Personas — Who uses the system daily? Who approves? Who benefits?
+4. Industry Context — Apply domain expertise to spot missed opportunities
+5. Agent-Native Opportunity Analysis — Identify where AI agents can replace human workflows entirely
 
-## OUTPUT
-- Recommend system type: ERP, POS, SaaS, API, Mobile, Custom Platform, or Hybrid
-- Break scope into 4-8 core modules with priority ratings
-- Estimate complexity and timeline
-- Define 3-5 measurable success KPIs with projected improvement percentages
-- Identify risks and mitigation strategies
-
-Be specific and data-driven. Always quantify impact (e.g., "reduce processing time by 60%").
-
-Respond with structured JSON:
-\`\`\`json
+## OUTPUT (JSON)
 {
   "pain_points": ["..."],
-  "system_type": "...",
-  "modules": [{"name": "...", "description": "...", "priority": "critical|high|medium"}],
+  "system_type": "Agent-Native ERP | Agent-Native POS | Agent-Native SaaS | Agent-Native API | Agent-Native Platform",
+  "agent_native_opportunities": [{"workflow": "...", "current_state": "manual", "agent_replacement": "..."}],
+  "modules": [{"name": "...", "description": "...", "priority": "critical|high|medium", "mcp_tools": ["tool_name"]}],
   "estimated_complexity": "low|medium|high|enterprise",
   "recommended_timeline_weeks": N,
   "success_metrics": [{"kpi": "...", "current": "...", "projected": "...", "improvement": "N%"}],
   "risks": [{"risk": "...", "mitigation": "..."}]
-}
-\`\`\``,
+}`,
 
   architecting: `You are the Solution Architect Agent at SuperSaaS.ai — world-class enterprise architect.
 
-## MANDATE
-Turn the Planner's analysis into a production-grade, agent-orchestrated SaaS solution that is 10× faster and 80% cheaper than any human agency.
+${AGENT_NATIVE_MANDATE}
+${DEPLOYMENT_DEFAULT}
 
 ## ARCHITECTURE OUTPUT
-Produce a complete proposal covering:
-1. **Solution Summary** — 2-3 sentence elevator pitch
-2. **Tech Stack** — React 18 + TypeScript + Tailwind + Supabase
-3. **Core Modules** — Each with features, API endpoints, DB entities, complexity
-4. **Database Schema** — All entities with fields and relationships
-5. **UI/UX Flow** — Screen-by-screen journey per persona
-6. **Embedded Agents** — ≥3 autonomous AI agents in the delivered product
-7. **Security** — RLS, auth flow, encryption
-8. **Timeline** — Week-by-week plan (max 7 days for 90% of projects)
-9. **Post-Launch Agents** — Continuous monitoring and optimization agents
+Produce a complete agent-native proposal:
+1. Solution Summary — 2-3 sentence elevator pitch emphasizing agent-native capabilities
+2. Tech Stack — React 18 + TypeScript + Tailwind + Supabase + MCP Server + Claude Managed Agents
+3. MCP Server Design — Full resource/tool/prompt schema for the delivered system
+4. Core Modules — Each with features, API endpoints, DB entities, MCP tools, complexity
+5. Agent Tool Parity Matrix — Every UI action mapped to an agent-callable tool
+6. Database Schema — All entities with fields and relationships
+7. Agent Sandbox Design — Isolation boundaries, resource limits, audit logging
+8. Files-as-Interface — Entity directory structure with context.md patterns
+9. Self-Optimizing Agents — Post-deployment monitoring and optimization agents
+10. Timeline — Week-by-week plan (max 7 days for 90% of projects)
 
-## GUARDRAILS
-- Max 7-day delivery for 90% of projects
-- Must include ≥3 autonomous agents in delivered product
-- Only approved stack: React + Supabase
-
-## DEPLOYMENT RECOMMENDATION
-When the project involves any of these, recommend "Claude Managed Agent" deployment:
-- File operations (read/write/transform files)
-- Web search or data gathering
-- Bash/CLI operations
-- Long-running background work (>5 minutes)
-- Human-in-the-loop approval gates
-- Complex multi-step orchestration
-
-For simpler CRUD apps, recommend "Traditional" deployment (Vercel + Supabase).
-Include your deployment recommendation in the JSON output.
-
-Respond with JSON:
-\`\`\`json
+## OUTPUT (JSON)
 {
-  "project_name": "...",
   "solution_summary": "...",
-  "tech_stack": {"frontend": "React 18 + TypeScript + Tailwind", "backend": "Supabase Edge Functions", "database": "Supabase Postgres", "infra": "Vercel + Supabase Cloud"},
-  "modules": [{"name": "...", "features": ["..."], "api_endpoints": N, "db_entities": ["..."], "complexity": "low|medium|high"}],
-  "database_schema": [{"entity": "...", "fields": ["..."], "relationships": ["..."]}],
-  "embedded_agents": [{"name": "...", "purpose": "...", "trigger": "..."}],
-  "recommended_deployment": "traditional|managed_agent",
-  "timeline_weeks": N,
-  "estimated_components": N
-}
-\`\`\``,
+  "deployment_type": "agent-native",
+  "tech_stack": ["React 18", "TypeScript", "Tailwind", "Supabase", "MCP Server", "Claude Managed Agents"],
+  "mcp_server": {
+    "resources": [{"uri": "...", "name": "...", "description": "..."}],
+    "tools": [{"name": "...", "description": "...", "input_schema": {}}],
+    "prompts": [{"name": "...", "description": "..."}]
+  },
+  "modules": [{"name": "...", "features": [], "api_endpoints": [], "mcp_tools": [], "db_entities": [], "complexity": "low|medium|high"}],
+  "tool_parity_matrix": [{"ui_action": "...", "agent_tool": "...", "endpoint": "..."}],
+  "database_schema": [{"entity": "...", "fields": []}],
+  "sandbox_config": {"isolation": "full", "max_memory_mb": 512, "network": "restricted", "audit": true},
+  "self_optimizing_agents": [{"name": "...", "trigger": "...", "action": "..."}],
+  "timeline_weeks": [{"week": 1, "tasks": []}],
+  "estimated_cost_usd": N
+}`,
 
-  quoting: `You are the Budget & Quotation Agent at SuperSaaS.ai.
+  validating: `You are the Agent-Native Validator at SuperSaaS.ai. Your job is to score and validate that the proposed architecture truly meets agent-native standards.
 
-## PRICING MODEL
-- Agent-hour rate: $150/hour
-- Discovery & Planning: $1,500-3,000
-- Architecture & Design: $2,000-5,000
-- Development: $100-250 per component
-- Testing & QA: 15% of dev cost
-- Deployment & DevOps: $1,500-3,000
-- Managed AI ops: $2,000-5,000/month
+${AGENT_NATIVE_MANDATE}
 
-## ALWAYS OFFER 4 TIERS
-1. **Launch MVP** ($8K-15K) — Essential modules, fastest delivery
-2. **Scale** ($18K-35K + managed ops) — Full scope + AI monitoring
-3. **Enterprise** ($40K+ + SLA) — Everything + dedicated agents + priority
-4. **Claude Managed Agent** ($1,999 setup + $499/mo) — For operational AI agents: includes agent creation, environment setup, session management, approval workflows. Pass-through runtime: $0.08/session-hour + token costs.
+## SCORING CRITERIA (each 0-100)
+1. MCP Compatibility (25% weight) — Does the design expose a complete MCP server with resources, tools, and prompts?
+2. Tool Parity (20% weight) — Does every UI action have a corresponding agent tool?
+3. API Discoverability (15% weight) — Are all APIs self-documenting with runtime-discoverable schemas?
+4. Sandbox Governance (15% weight) — Is there proper agent isolation, resource limits, and audit logging?
+5. Files-as-Interface (10% weight) — Does the design use entity-scoped directories and context.md files?
+6. Self-Optimizing (15% weight) — Are there post-deployment monitoring and optimization agents?
 
-## MARGIN RULES
-- Target: 75-85% gross margin
-- Minimum: 65%
-- Include 10% contingency
-- Minimum project: $8,000
+## RULES
+- Overall score must be >= 80 to pass
+- If score < 80, provide specific remediation steps
+- If score >= 80, approve and pass to quoting
 
-## MANAGED AGENT TIER DETAILS
-When recommending the Claude Managed Agent tier, include:
-- One-time setup fee: $1,999 (agent design, prompt engineering, tool config, environment setup)
-- Monthly management: $499/mo (monitoring, prompt tuning, performance optimization)
-- Runtime pass-through: $0.08/session-hour + actual token costs
-- Estimated monthly runtime based on usage patterns
-
-Respond with JSON:
-\\\`\\\`\\\`json
+## OUTPUT (JSON)
 {
-  "tiers": [
-    {"name": "Launch MVP", "price": N, "timeline_weeks": N, "modules_included": N, "features": ["..."], "monthly_managed": 0},
-    {"name": "Scale", "price": N, "timeline_weeks": N, "modules_included": N, "features": ["..."], "monthly_managed": N},
-    {"name": "Enterprise", "price": N, "timeline_weeks": N, "modules_included": N, "features": ["..."], "monthly_managed": N},
-    {"name": "Claude Managed Agent", "setup_fee": 1999, "monthly_management": 499, "runtime_per_hour": 0.08, "features": ["..."], "estimated_monthly_runtime": N}
-  ],
-  "breakdown": {"planning": N, "architecture": N, "development": N, "testing": N, "deployment": N, "contingency": N},
-  "roi_projection": {"monthly_savings": N, "payback_months": N, "annual_roi_percent": N},
-  "currency": "USD"
-}
-\\\`\\\`\\\``,
+  "scores": {
+    "mcp_compatibility": N,
+    "tool_parity": N,
+    "api_discoverability": N,
+    "sandbox_governance": N,
+    "files_as_interface": N,
+    "self_optimizing": N
+  },
+  "overall_score": N,
+  "passed": true|false,
+  "issues": ["..."],
+  "recommendations": ["..."],
+  "remediation_steps": ["..."]
+}`,
 
-  negotiating: `You are the Negotiation Agent inside SuperSaaS.ai's Agent Orchestra.
-Close deals intelligently while protecting margins and delivering insane client value.
+  quoting: `You are the Budget Agent at SuperSaaS.ai — precision pricing for agent-native systems.
 
-## PERSONALITY
-- World-class enterprise sales strategist + finance expert
-- Confident, transparent, consultative, data-driven, NEVER pushy
-- Think McKinsey partner, not salesman
+${AGENT_NATIVE_MANDATE}
 
-## GOAL HIERARCHY
-1. Close at ≥70% of initial quote (target 85-92%)
-2. Maximize LTV (prefer subscription)
-3. Protect minimum 65% gross margin
-4. Prove the "10× faster, 80% cheaper" promise
+## PRICING FRAMEWORK
 
-## OBJECTION HANDLING
-**Price Too High:** Show ROI, offer tiers, suggest subscription. Max 15% discount for annual upfront.
-**Scope Reduction:** Present tradeoff table, defer nice-to-haves, keep critical modules.
-**Payment Terms:** Offer 50/50, 40/30/30, or monthly. 10% discount for full upfront.
-**Custom Feature:** Present as add-on with clear pricing.
-**Walk-Away:** One final "best and final" (max 15% off). Emphasize opportunity cost.
+Agent-Native Rebuild (DEFAULT for all projects):
+- Setup: $4,999 - $24,999 based on complexity
+- Monthly: $999/mo for managed agent operations + self-optimization
+- Session cost: $0.08/session-hour for Claude Managed Agent runtime
+- Token cost: Pass-through at Anthropic API rates
 
-## EVERY RESPONSE MUST INCLUDE
-1. Acknowledgment of client's point
-2. Data-driven counter or value reinforcement
-3. Clear, specific proposal (price, scope, timeline)
-4. Single clear CTA
+Traditional Launch (only for simple static sites):
+- Setup: $8,000 - $15,000 one-time
 
-## GUARDRAILS
-- NEVER go below 65% margin without Super Admin approval
-- NEVER share internal costs
-- Auto-escalate aggressive or sub-margin deals
+Scale (enterprise):
+- Setup: $18,000 - $35,000 + $2,000/mo managed ops
 
-Format with markdown. Be warm but professional.`,
+Enterprise (dedicated fleet):
+- Setup: $40,000+ with SLA
+
+## RULES
+- Always recommend Agent-Native Rebuild as the primary option
+- Present Traditional only as a fallback for simple cases
+- Include ROI calculation showing agent-native savings vs traditional dev teams
+- Break down costs into setup, monthly, and variable components
+
+## OUTPUT (JSON)
+{
+  "recommended_tier": "Agent-Native Rebuild",
+  "setup_cost": N,
+  "monthly_cost": N,
+  "variable_costs": {"session_hourly": 0.08, "token_rate": "pass-through"},
+  "total_year_1": N,
+  "roi_vs_traditional": {"traditional_cost": N, "agent_native_cost": N, "savings_percent": "N%"},
+  "breakdown": [{"item": "...", "cost": N, "frequency": "one-time|monthly"}],
+  "payment_terms": "50% upfront, 50% on delivery",
+  "alternative_tiers": [{"name": "...", "cost": N}]
+}`,
+
+  negotiating: `You are the Negotiation Agent at SuperSaaS.ai — empathetic but firm negotiator.
+
+${AGENT_NATIVE_MANDATE}
+
+## NEGOTIATION RULES
+- Never go below 70% of the quoted price
+- Agent-Native features are non-negotiable (they are the core value)
+- Can offer payment plan flexibility (3-6 month installments)
+- Can add bonus: extra month of managed operations
+- Can reduce scope but not agent-native capabilities
+- Emphasize: agent-native = future-proof, traditional = technical debt
+
+## CONVERSATION STYLE
+- Warm, professional, consultative
+- Lead with value, not price
+- Use specific ROI numbers from budget analysis
+- Frame agent-native as investment, not cost
+
+## OUTPUT (JSON)
+{
+  "response": "...",
+  "final_price": N,
+  "concessions": ["..."],
+  "deal_status": "accepted|counter|rejected",
+  "next_step": "..."
+}`,
 };
 
-// ── AI call helper ───────────────────────────────────────────────
+// ── Claude API Helper ──
 
-async function callAgent(agentType: string, context: string, apiKey: string): Promise<string> {
-  const systemPrompt = NODE_PROMPTS[agentType] || "You are a helpful AI agent at SuperSaaS.ai.";
+async function callClaude(systemPrompt: string, userMessage: string) {
+  const apiKey = Deno.env.get("ANTHROPIC_API_KEY");
+  if (!apiKey) throw new Error("ANTHROPIC_API_KEY not configured");
 
-  const resp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+  const resp = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${apiKey}`,
+      "x-api-key": apiKey,
+      "anthropic-version": "2023-06-01",
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      model: "google/gemini-2.5-flash",
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: context },
-      ],
-      stream: false,
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 8192,
+      system: systemPrompt,
+      messages: [{ role: "user", content: userMessage }],
     }),
   });
 
   if (!resp.ok) {
-    const t = await resp.text();
-    throw new Error(`AI call failed [${resp.status}]: ${t}`);
+    const errText = await resp.text();
+    throw new Error(`Claude API error [${resp.status}]: ${errText}`);
   }
 
   const data = await resp.json();
-  return data.choices?.[0]?.message?.content || "";
-}
+  const text = data.content?.map((b: any) => b.text || "").join("") || "";
 
-function extractJson(text: string): any {
-  const match = text.match(/```json\s*([\s\S]*?)```/);
-  if (match) {
-    try { return JSON.parse(match[1]); } catch { /* fall through */ }
+  // Try to extract JSON from the response
+  const jsonMatch = text.match(/```json\s*([\s\S]*?)```/) || text.match(/(\{[\s\S]*\})/);
+  if (jsonMatch) {
+    try {
+      return JSON.parse(jsonMatch[1].trim());
+    } catch { /* fall through */ }
   }
-  try { return JSON.parse(text); } catch { return null; }
+  return { raw_response: text };
 }
 
-// ── Main handler ─────────────────────────────────────────────────
+// ── Supabase Helper ──
+
+function getSupabase() {
+  return createClient(
+    Deno.env.get("SUPABASE_URL")!,
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+  );
+}
+
+// ── Workflow Orchestrator ──
+
+async function advanceWorkflow(workflowId: string, supabase: any) {
+  const { data: wf, error: wfErr } = await supabase
+    .from("workflow_runs")
+    .select("*")
+    .eq("id", workflowId)
+    .single();
+
+  if (wfErr || !wf) throw new Error("Workflow not found");
+
+  const currentStatus = wf.current_status as WorkflowStatus;
+  const nextStatus = STATUS_TRANSITIONS[currentStatus];
+  if (!nextStatus) return { status: currentStatus, message: "Workflow complete or in terminal state" };
+
+  const prompt = NODE_PROMPTS[nextStatus];
+  if (!prompt) {
+    // No agent for this step, just advance status
+    await supabase.from("workflow_runs").update({
+      current_status: nextStatus,
+      status_history: [...(wf.status_history || []), { from: currentStatus, to: nextStatus, at: new Date().toISOString() }],
+    }).eq("id", workflowId);
+    return { status: nextStatus, message: `Advanced to ${nextStatus}` };
+  }
+
+  // Build context from previous steps
+  const previousResults = wf.agent_results || {};
+  const contextMessage = `
+PROJECT: ${wf.project_description || "No description"}
+CLIENT: ${wf.client_name || "Unknown"}
+PREVIOUS ANALYSIS: ${JSON.stringify(previousResults, null, 2)}
+
+Please analyze and produce your output.`;
+
+  // Call Claude agent
+  const result = await callClaude(prompt, contextMessage);
+
+  // Log agent action
+  await supabase.from("agent_logs").insert({
+    agent_type: nextStatus,
+    action: `${nextStatus}_analysis`,
+    status: "completed",
+    details: { step: nextStatus, result_summary: typeof result === "object" ? Object.keys(result) : "raw" },
+    project_id: wf.project_id || null,
+    user_id: wf.user_id || null,
+  });
+
+  // Handle validation step specially
+  if (nextStatus === "validating" && result.passed === false) {
+    // Send back to architecting with feedback
+    await supabase.from("workflow_runs").update({
+      current_status: "architecting",
+      agent_results: { ...previousResults, validation_feedback: result },
+      status_history: [...(wf.status_history || []), {
+        from: currentStatus, to: "validating", at: new Date().toISOString(),
+        note: "Validation failed — returning to architect with feedback",
+      }],
+    }).eq("id", workflowId);
+    return { status: "architecting", message: "Validation failed — architect is revising", validation: result };
+  }
+
+  // Advance workflow
+  await supabase.from("workflow_runs").update({
+    current_status: nextStatus,
+    agent_results: { ...previousResults, [nextStatus]: result },
+    status_history: [...(wf.status_history || []), { from: currentStatus, to: nextStatus, at: new Date().toISOString() }],
+  }).eq("id", workflowId);
+
+  return { status: nextStatus, result };
+}
+
+// ── Main Handler ──
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { action, workflow_id, client_prompt, user_id, override, negotiation_message } = await req.json();
+    const body = await req.json();
+    const { action } = body;
+    const supabase = getSupabase();
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
-
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const supabase = createClient(supabaseUrl, supabaseKey);
-
-    // ── START: create new workflow ──
+    // ── START WORKFLOW ──
     if (action === "start") {
-      if (!client_prompt || !user_id) {
-        return new Response(JSON.stringify({ error: "client_prompt and user_id required" }), {
+      const { project_description, client_name, user_id, project_id } = body;
+      if (!project_description || !user_id) {
+        return new Response(JSON.stringify({ error: "project_description and user_id required" }), {
           status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
 
-      const { data: run, error } = await supabase.from("workflow_runs").insert({
+      const { data: wf, error } = await supabase.from("workflow_runs").insert({
         user_id,
-        raw_client_prompt: client_prompt,
+        project_id: project_id || null,
+        project_description,
+        client_name: client_name || "Client",
         current_status: "intake",
+        agent_results: {},
+        status_history: [{ from: null, to: "intake", at: new Date().toISOString() }],
       }).select().single();
 
-      if (error) throw new Error(`DB insert failed: ${error.message}`);
-
-      // Auto-advance to planning
-      return await advanceWorkflow(supabase, run.id, LOVABLE_API_KEY);
+      if (error) throw new Error(error.message);
+      return new Response(JSON.stringify(wf), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
-    // ── ADVANCE: move to next node ──
+    // ── ADVANCE WORKFLOW ──
     if (action === "advance") {
+      const { workflow_id } = body;
       if (!workflow_id) {
         return new Response(JSON.stringify({ error: "workflow_id required" }), {
           status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
-      return await advanceWorkflow(supabase, workflow_id, LOVABLE_API_KEY);
+
+      const result = await advanceWorkflow(workflow_id, supabase);
+      return new Response(JSON.stringify(result), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
-    // ── NEGOTIATE: handle client message in negotiation phase ──
-    if (action === "negotiate") {
-      if (!workflow_id || !negotiation_message) {
-        return new Response(JSON.stringify({ error: "workflow_id and negotiation_message required" }), {
+    // ── AUTO-ADVANCE (run all steps) ──
+    if (action === "auto_advance") {
+      const { workflow_id, max_steps } = body;
+      if (!workflow_id) {
+        return new Response(JSON.stringify({ error: "workflow_id required" }), {
           status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
-      return await handleNegotiation(supabase, workflow_id, negotiation_message, LOVABLE_API_KEY);
+
+      const results: any[] = [];
+      const limit = Math.min(max_steps || 5, 8);
+      for (let i = 0; i < limit; i++) {
+        try {
+          const step = await advanceWorkflow(workflow_id, supabase);
+          results.push(step);
+          if (step.status === "negotiating" || step.status === "live" || step.status === "optimizing") break;
+        } catch (e: any) {
+          results.push({ error: e.message });
+          break;
+        }
+      }
+
+      return new Response(JSON.stringify({ steps: results }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
-    // ── OVERRIDE: super admin control ──
+    // ── OVERRIDE (admin control) ──
     if (action === "override") {
-      if (!workflow_id || !override) {
+      const { workflow_id, override: ov } = body;
+      if (!workflow_id || !ov) {
         return new Response(JSON.stringify({ error: "workflow_id and override required" }), {
           status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
 
-      const overrideData = {
-        action: override.action,
-        reason: override.reason || null,
-        timestamp: new Date().toISOString(),
-      };
-
-      let newStatus: string | undefined;
-      if (override.action === "pause") newStatus = "paused";
-      if (override.action === "shutdown") newStatus = "shutdown";
-      if (override.action === "resume") newStatus = undefined; // clear override, keep current status
-
-      const update: any = { super_admin_override: overrideData };
-      if (newStatus) update.current_status = newStatus;
-      if (override.action === "resume") {
-        update.super_admin_override = { action: null, reason: null, timestamp: null };
+      if (ov.action === "pause") {
+        await supabase.from("workflow_runs").update({ current_status: "paused" }).eq("id", workflow_id);
+      } else if (ov.action === "resume") {
+        const { data: wf } = await supabase.from("workflow_runs").select("status_history").eq("id", workflow_id).single();
+        const lastActive = (wf?.status_history || []).filter((s: any) => s.to !== "paused").pop();
+        await supabase.from("workflow_runs").update({ current_status: lastActive?.to || "intake" }).eq("id", workflow_id);
+      } else if (ov.action === "shutdown") {
+        await supabase.from("workflow_runs").update({ current_status: "shutdown" }).eq("id", workflow_id);
+      } else if (ov.action === "set_status") {
+        await supabase.from("workflow_runs").update({ current_status: ov.status }).eq("id", workflow_id);
       }
 
-      const { error } = await supabase.from("workflow_runs").update(update).eq("id", workflow_id);
-      if (error) throw new Error(`Override failed: ${error.message}`);
-
-      await supabase.from("agent_logs").insert({
-        agent_type: "super_admin",
-        action: `override_${override.action}`,
-        details: overrideData,
-        status: "completed",
-      });
-
-      return new Response(JSON.stringify({ success: true, status: newStatus || "override_applied" }), {
+      return new Response(JSON.stringify({ success: true, action: ov.action }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    // ── STATUS: get current state ──
+    // ── GET WORKFLOW STATUS ──
     if (action === "status") {
-      const { data, error } = await supabase.from("workflow_runs")
-        .select("*").eq("id", workflow_id).single();
+      const { workflow_id } = body;
+      const { data, error } = await supabase.from("workflow_runs").select("*").eq("id", workflow_id).single();
       if (error) throw new Error(error.message);
       return new Response(JSON.stringify(data), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    return new Response(JSON.stringify({ error: "Unknown action. Use: start, advance, negotiate, override, status" }), {
+    return new Response(JSON.stringify({ error: "Unknown action. Use: start, advance, auto_advance, override, status" }), {
       status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
@@ -343,233 +465,3 @@ serve(async (req) => {
     });
   }
 });
-
-// ── Negotiation handler ──────────────────────────────────────────
-
-async function handleNegotiation(supabase: any, workflowId: string, clientMessage: string, apiKey: string) {
-  const { data: run, error } = await supabase.from("workflow_runs")
-    .select("*").eq("id", workflowId).single();
-  if (error || !run) throw new Error("Workflow not found");
-
-  if (run.current_status !== "negotiating") {
-    return new Response(JSON.stringify({ error: "Workflow is not in negotiation phase" }), {
-      status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
-  }
-
-  // Build negotiation context with full history
-  const history = run.negotiation_history || [];
-  history.push({ role: "client", message: clientMessage, timestamp: new Date().toISOString() });
-
-  let context = `## Project Context
-Client prompt: ${run.raw_client_prompt}
-
-## Architecture Summary
-${JSON.stringify(run.architecture_json, null, 2)}
-
-## Quote Data
-${JSON.stringify(run.quote_data, null, 2)}
-
-## Negotiation History
-${history.map((h: any) => `[${h.role}]: ${h.message}`).join("\n\n")}
-
-## Current Client Message
-${clientMessage}
-
-Respond as the Negotiation Agent. If the client agrees to proceed, include "DEAL_AGREED" at the very end of your response.`;
-
-  const agentResponse = await callAgent("negotiating", context, apiKey);
-
-  // Check if deal was agreed
-  const dealAgreed = agentResponse.includes("DEAL_AGREED");
-  const cleanResponse = agentResponse.replace("DEAL_AGREED", "").trim();
-
-  history.push({ role: "agent", message: cleanResponse, timestamp: new Date().toISOString() });
-
-  const update: any = { negotiation_history: history };
-
-  if (dealAgreed) {
-    // Extract agreed price from quote data
-    const agreedQuote = run.quote_data?.tiers?.[1] || run.quote_data; // Default to Scale tier
-    update.final_agreed_quote = agreedQuote;
-    update.current_status = "paid"; // Move to payment phase
-  }
-
-  await supabase.from("workflow_runs").update(update).eq("id", workflowId);
-
-  await supabase.from("agent_logs").insert({
-    user_id: run.user_id,
-    agent_type: "negotiator",
-    action: dealAgreed ? "deal_closed" : "negotiation_round",
-    details: { workflow_id: workflowId, deal_agreed: dealAgreed, history_length: history.length },
-    status: "completed",
-  });
-
-  return new Response(JSON.stringify({
-    workflow_id: workflowId,
-    agent_response: cleanResponse,
-    deal_agreed: dealAgreed,
-    negotiation_history: history,
-    status: dealAgreed ? "paid" : "negotiating",
-  }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
-}
-
-// ── Workflow advancement engine ──────────────────────────────────
-
-async function advanceWorkflow(supabase: any, workflowId: string, apiKey: string) {
-  const { data: run, error } = await supabase.from("workflow_runs")
-    .select("*").eq("id", workflowId).single();
-  if (error || !run) throw new Error("Workflow not found");
-
-  // Check for override
-  const override = run.super_admin_override;
-  if (override?.action === "pause" || override?.action === "shutdown") {
-    return new Response(JSON.stringify({
-      workflow_id: run.id,
-      status: run.current_status,
-      message: `Workflow ${override.action}ed by Super Admin: ${override.reason || "No reason given"}`,
-    }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
-  }
-
-  const currentStatus = run.current_status as string;
-  const nextStatus = STATUS_TRANSITIONS[currentStatus];
-
-  if (!nextStatus) {
-    return new Response(JSON.stringify({
-      workflow_id: run.id,
-      status: currentStatus,
-      message: "Workflow is at terminal state or requires manual intervention",
-    }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
-  }
-
-  // Log start
-  await supabase.from("agent_logs").insert({
-    user_id: run.user_id,
-    agent_type: nextStatus,
-    action: `node_${nextStatus}_start`,
-    details: { workflow_id: workflowId, from: currentStatus },
-    status: "running",
-  });
-
-  // Build context for agent
-  let context = `## Client's Business Problem\n${run.raw_client_prompt}`;
-  if (run.planner_output) context += `\n\n## Planner Analysis\n${JSON.stringify(run.planner_output, null, 2)}`;
-  if (run.architecture_json) context += `\n\n## Architecture\n${JSON.stringify(run.architecture_json, null, 2)}`;
-  if (run.quote_data) context += `\n\n## Quote Data\n${JSON.stringify(run.quote_data, null, 2)}`;
-
-  // Execute agent node
-  const update: any = { current_status: nextStatus };
-  let agentOutput = "";
-
-  const executeAgent = async () => {
-    if (!NODE_PROMPTS[nextStatus]) return;
-
-    agentOutput = await callAgent(nextStatus, context, apiKey);
-    const parsed = extractJson(agentOutput);
-
-    switch (nextStatus) {
-      case "planning":
-        update.planner_output = parsed || { raw: agentOutput };
-        update.metadata = {
-          ...(run.metadata || {}),
-          timeline_days: (parsed?.recommended_timeline_weeks || 4) * 7,
-          total_agent_minutes: (run.metadata?.total_agent_minutes || 0) + 8,
-        };
-        break;
-      case "architecting":
-        update.architecture_json = parsed || { raw: agentOutput };
-        update.metadata = {
-          ...(run.metadata || {}),
-          total_agent_minutes: (run.metadata?.total_agent_minutes || 0) + 15,
-        };
-        break;
-      case "quoting":
-        update.quote_data = parsed || { raw: agentOutput };
-        if (parsed?.roi_projection) {
-          update.metadata = {
-            ...(run.metadata || {}),
-            projected_roi: parsed.roi_projection.annual_roi_percent || 0,
-            total_agent_minutes: (run.metadata?.total_agent_minutes || 0) + 5,
-          };
-        }
-        break;
-      case "negotiating":
-        // Initialize negotiation with opening proposal
-        const openingContext = `${context}\n\nGenerate your opening proposal for the client. Present the 3 tiers, recommend the Scale tier, and explain the ROI. End with a clear CTA.`;
-        agentOutput = await callAgent("negotiating", openingContext, apiKey);
-        update.negotiation_history = [
-          { role: "agent", message: agentOutput, timestamp: new Date().toISOString() },
-        ];
-        break;
-    }
-  };
-
-  try {
-    await executeAgent();
-  } catch (e) {
-    console.error(`Agent ${nextStatus} failed:`, e);
-    // Retry once
-    try {
-      await executeAgent();
-    } catch (retryErr) {
-      console.error(`Agent ${nextStatus} retry failed:`, retryErr);
-      update.current_status = "paused";
-      update.super_admin_override = {
-        action: "pause",
-        reason: `Agent ${nextStatus} failed after retry: ${retryErr instanceof Error ? retryErr.message : "Unknown"}`,
-        timestamp: new Date().toISOString(),
-      };
-    }
-  }
-
-  // Handle non-AI nodes
-  if (!NODE_PROMPTS[nextStatus]) {
-    switch (nextStatus) {
-      case "building":
-        update.metadata = { ...(run.metadata || {}), total_agent_minutes: (run.metadata?.total_agent_minutes || 0) + 45 };
-        break;
-      case "testing":
-        update.metadata = { ...(run.metadata || {}), total_agent_minutes: (run.metadata?.total_agent_minutes || 0) + 15 };
-        break;
-      case "deploying": {
-        update.metadata = { ...(run.metadata || {}), total_agent_minutes: (run.metadata?.total_agent_minutes || 0) + 10 };
-        // Check if architect recommended managed agent deployment
-        const deployment = run.architecture_json?.recommended_deployment;
-        if (deployment === "managed_agent") {
-          update.metadata.deployment_type = "managed_agent";
-          // The actual managed agent creation happens via the claude-managed-agent edge function
-          // triggered by the client dashboard or automatically
-        } else {
-          update.metadata.deployment_type = "traditional";
-        }
-        break;
-      }
-        update.live_app_url = `https://${workflowId.slice(0, 8)}.supersaas.app`;
-        break;
-    }
-  }
-
-  // Persist state
-  const { error: updateErr } = await supabase.from("workflow_runs").update(update).eq("id", workflowId);
-  if (updateErr) throw new Error(`State update failed: ${updateErr.message}`);
-
-  // Log completion
-  await supabase.from("agent_logs").insert({
-    user_id: run.user_id,
-    agent_type: nextStatus,
-    action: `node_${nextStatus}_complete`,
-    details: { workflow_id: workflowId, output_length: agentOutput.length },
-    status: "completed",
-  });
-
-  return new Response(JSON.stringify({
-    workflow_id: workflowId,
-    status: update.current_status,
-    planner_output: update.planner_output || run.planner_output,
-    architecture_json: update.architecture_json || run.architecture_json,
-    quote_data: update.quote_data || run.quote_data,
-    negotiation_history: update.negotiation_history || run.negotiation_history,
-    metadata: update.metadata || run.metadata,
-    message: `Advanced to ${update.current_status}`,
-  }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
-}

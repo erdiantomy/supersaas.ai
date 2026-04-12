@@ -31,7 +31,17 @@ export default function ClientPortal() {
         .eq("user_id", user.id);
       setHasSubmissions((count ?? 0) > 0);
 
-      const { data: pj } = await supabase.from("projects").select("*").order("created_at", { ascending: false });
+      // Get client record for this user
+      const { data: client } = await supabase
+        .from("clients")
+        .select("id")
+        .eq("user_id", user.id)
+        .limit(1)
+        .single();
+
+      const { data: pj } = client
+        ? await supabase.from("projects").select("*").eq("client_id", client.id).order("created_at", { ascending: false })
+        : { data: [] as Project[] };
       setProjects(pj ?? []);
 
       if (pj && pj.length > 0) {

@@ -124,7 +124,7 @@ export default function DashboardProjectDetail() {
       user_id: user.id,
       content: newComment.trim(),
       is_admin: isAdmin,
-    } as any);
+    });
     if (error) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     } else {

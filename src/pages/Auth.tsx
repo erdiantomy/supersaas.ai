@@ -24,7 +24,18 @@ export default function Auth() {
     );
   }
 
-  if (session) return <Navigate to="/dashboard" replace />;
+  if (session) {
+    // Redirect based on role — admin to dashboard, client to portal
+    const { role: userRole, loading: roleLoading } = useAuth();
+    if (roleLoading) {
+      return (
+        <div className="min-h-screen bg-background flex items-center justify-center">
+          <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+        </div>
+      );
+    }
+    return <Navigate to={userRole === "admin" ? "/dashboard" : "/portal"} replace />;
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

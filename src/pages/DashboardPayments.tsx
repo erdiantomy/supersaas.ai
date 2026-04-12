@@ -67,7 +67,7 @@ export default function DashboardPayments() {
       description: form.description || null,
       revenuecat_id: form.revenuecat_id || null,
       paid_at: form.status === "paid" ? new Date().toISOString() : null,
-    } as any);
+    });
     if (error) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
       return;

@@ -58,14 +58,14 @@ export default function DashboardInquiries() {
   });
 
   const handleStatusChange = async (id: string, status: string) => {
-    await supabase.from("inquiries").update({ status } as any).eq("id", id);
+    await supabase.from("inquiries").update({ status }).eq("id", id);
     load();
     toast({ title: `Status updated to ${status}` });
   };
 
   const handleSaveNotes = async () => {
     if (!selected) return;
-    await supabase.from("inquiries").update({ notes: adminNotes } as any).eq("id", selected.id);
+    await supabase.from("inquiries").update({ notes: adminNotes }).eq("id", selected.id);
     toast({ title: "Notes saved" });
     setSelected(null);
     load();

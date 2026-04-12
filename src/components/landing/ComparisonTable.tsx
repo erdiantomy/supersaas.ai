@@ -4,10 +4,12 @@ import { Check, X, Minus } from "lucide-react";
 const rows = [
   { feature: "Fits your exact workflow", saas: "You adapt to it", agency: "Eventually", supersaas: "Built around you" },
   { feature: "Time to production", saas: "Instant (misconfigured)", agency: "6–18 months", supersaas: "4–8 weeks" },
-  { feature: "AI-native from day 1", saas: false, agency: false, supersaas: true },
+  { feature: "Agent-native from day 1", saas: false, agency: false, supersaas: true },
+  { feature: "MCP server built-in", saas: false, agency: false, supersaas: true },
   { feature: "Code & IP ownership", saas: "You rent access", agency: "Depends on contract", supersaas: "You own 100%" },
   { feature: "Post-launch iteration", saas: "Wait for vendor roadmap", agency: "New SOW + 8 weeks", supersaas: "AI agents iterate in days" },
   { feature: "Autonomous monitoring", saas: false, agency: false, supersaas: true },
+  { feature: "Self-optimizing agents", saas: false, agency: false, supersaas: true },
   { feature: "Cost to change a feature", saas: "Not possible", agency: "$5K–$20K per change", supersaas: "Included in Managed tier" },
   { feature: "3-year total cost", saas: "$36K–$180K", agency: "$200K–$500K+", supersaas: "$12K–$60K (you own it)" },
 ];
@@ -37,7 +39,7 @@ export function ComparisonTable() {
             The Real Comparison
           </h2>
           <p className="text-lg text-muted-foreground">
-            Generic SaaS vs Traditional Agency vs Agent-Powered.
+            Generic SaaS vs Traditional Agency vs Agent-Native Rebuild.
           </p>
         </motion.div>
 
