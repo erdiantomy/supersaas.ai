@@ -83,6 +83,18 @@ Produce a complete proposal covering:
 - Must include ≥3 autonomous agents in delivered product
 - Only approved stack: React + Supabase
 
+## DEPLOYMENT RECOMMENDATION
+When the project involves any of these, recommend "Claude Managed Agent" deployment:
+- File operations (read/write/transform files)
+- Web search or data gathering
+- Bash/CLI operations
+- Long-running background work (>5 minutes)
+- Human-in-the-loop approval gates
+- Complex multi-step orchestration
+
+For simpler CRUD apps, recommend "Traditional" deployment (Vercel + Supabase).
+Include your deployment recommendation in the JSON output.
+
 Respond with JSON:
 \`\`\`json
 {
@@ -92,6 +104,7 @@ Respond with JSON:
   "modules": [{"name": "...", "features": ["..."], "api_endpoints": N, "db_entities": ["..."], "complexity": "low|medium|high"}],
   "database_schema": [{"entity": "...", "fields": ["..."], "relationships": ["..."]}],
   "embedded_agents": [{"name": "...", "purpose": "...", "trigger": "..."}],
+  "recommended_deployment": "traditional|managed_agent",
   "timeline_weeks": N,
   "estimated_components": N
 }
