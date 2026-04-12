@@ -531,10 +531,19 @@ async function advanceWorkflow(supabase: any, workflowId: string, apiKey: string
       case "testing":
         update.metadata = { ...(run.metadata || {}), total_agent_minutes: (run.metadata?.total_agent_minutes || 0) + 15 };
         break;
-      case "deploying":
+      case "deploying": {
         update.metadata = { ...(run.metadata || {}), total_agent_minutes: (run.metadata?.total_agent_minutes || 0) + 10 };
+        // Check if architect recommended managed agent deployment
+        const deployment = run.architecture_json?.recommended_deployment;
+        if (deployment === "managed_agent") {
+          update.metadata.deployment_type = "managed_agent";
+          // The actual managed agent creation happens via the claude-managed-agent edge function
+          // triggered by the client dashboard or automatically
+        } else {
+          update.metadata.deployment_type = "traditional";
+        }
         break;
-      case "live":
+      }
         update.live_app_url = `https://${workflowId.slice(0, 8)}.supersaas.app`;
         break;
     }
