@@ -8,6 +8,17 @@ const corsHeaders = {
 const GATEWAY_URL = "https://connector-gateway.lovable.dev/resend";
 const ADMIN_EMAIL = "tom@nosecret.co";
 
+// Escape HTML entities to prevent XSS in email templates
+function escapeHtml(str: string | null | undefined): string {
+  if (!str) return "";
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -22,18 +33,25 @@ serve(async (req) => {
 
     const { name, email, company, budget, message } = await req.json();
 
+    // Sanitize all user inputs before inserting into HTML
+    const safeName = escapeHtml(name);
+    const safeEmail = escapeHtml(email);
+    const safeCompany = escapeHtml(company);
+    const safeBudget = escapeHtml(budget);
+    const safeMessage = escapeHtml(message);
+
     const htmlBody = `
 <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
   <h2 style="color: #00E676; margin-bottom: 20px;">🚀 New Lead from SuperSaaS.ai</h2>
   <table style="width: 100%; border-collapse: collapse;">
-    <tr><td style="padding: 8px 0; font-weight: bold; color: #333;">Name:</td><td style="padding: 8px 0; color: #555;">${name}</td></tr>
-    <tr><td style="padding: 8px 0; font-weight: bold; color: #333;">Email:</td><td style="padding: 8px 0; color: #555;"><a href="mailto:${email}">${email}</a></td></tr>
-    <tr><td style="padding: 8px 0; font-weight: bold; color: #333;">Company:</td><td style="padding: 8px 0; color: #555;">${company || "Not provided"}</td></tr>
-    <tr><td style="padding: 8px 0; font-weight: bold; color: #333;">Budget:</td><td style="padding: 8px 0; color: #555;">${budget || "Not specified"}</td></tr>
+    <tr><td style="padding: 8px 0; font-weight: bold; color: #333;">Name:</td><td style="padding: 8px 0; color: #555;">${safeName}</td></tr>
+    <tr><td style="padding: 8px 0; font-weight: bold; color: #333;">Email:</td><td style="padding: 8px 0; color: #555;"><a href="mailto:${safeEmail}">${safeEmail}</a></td></tr>
+    <tr><td style="padding: 8px 0; font-weight: bold; color: #333;">Company:</td><td style="padding: 8px 0; color: #555;">${safeCompany || "Not provided"}</td></tr>
+    <tr><td style="padding: 8px 0; font-weight: bold; color: #333;">Budget:</td><td style="padding: 8px 0; color: #555;">${safeBudget || "Not specified"}</td></tr>
   </table>
   <div style="margin-top: 16px; padding: 12px; background: #f5f5f5; border-radius: 8px;">
     <p style="font-weight: bold; color: #333; margin: 0 0 8px;">Message:</p>
-    <p style="color: #555; margin: 0;">${message || "No message provided"}</p>
+    <p style="color: #555; margin: 0;">${safeMessage || "No message provided"}</p>
   </div>
   <hr style="margin-top: 24px; border: none; border-top: 1px solid #eee;" />
   <p style="color: #999; font-size: 12px;">This notification was sent from the SuperSaaS.ai lead form.</p>
@@ -50,7 +68,7 @@ serve(async (req) => {
         from: "SuperSaaS.ai <onboarding@resend.dev>",
         to: [ADMIN_EMAIL],
         reply_to: email,
-        subject: `New Lead: ${name}${company ? ` (${company})` : ""}`,
+        subject: `New Lead: ${safeName}${safeCompany ? ` (${safeCompany})` : ""}`,
         html: htmlBody,
       }),
     });
