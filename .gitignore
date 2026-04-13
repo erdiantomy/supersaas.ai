@@ -32,3 +32,6 @@ dist-ssr
 # Test artifacts
 test-results/
 playwright-report/
+
+# Added by code-review-graph
+.code-review-graph/
