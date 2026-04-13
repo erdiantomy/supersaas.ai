@@ -8,7 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Mail, Lock, User, ArrowRight } from "lucide-react";
 
 export default function Auth() {
-  const { session, loading } = useAuth();
+  const { session, role, loading } = useAuth();
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -25,16 +25,7 @@ export default function Auth() {
   }
 
   if (session) {
-    // Redirect based on role — admin to dashboard, client to portal
-    const { role: userRole, loading: roleLoading } = useAuth();
-    if (roleLoading) {
-      return (
-        <div className="min-h-screen bg-background flex items-center justify-center">
-          <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-        </div>
-      );
-    }
-    return <Navigate to={userRole === "admin" ? "/dashboard" : "/portal"} replace />;
+    return <Navigate to={role === "admin" ? "/dashboard" : "/portal"} replace />;
   }
 
   const handleSubmit = async (e: React.FormEvent) => {

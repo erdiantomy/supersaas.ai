@@ -342,6 +342,84 @@ Please analyze and produce your output.`;
   return { status: nextStatus, result };
 }
 
+// ── Negotiate Handler ──
+
+async function handleNegotiation(workflowId: string, message: string, supabase: any) {
+  const { data: wf, error: wfErr } = await supabase
+    .from("workflow_runs")
+    .select("*")
+    .eq("id", workflowId)
+    .single();
+
+  if (wfErr || !wf) throw new Error("Workflow not found");
+  if (wf.current_status !== "negotiating") {
+    throw new Error(`Cannot negotiate: workflow is in '${wf.current_status}' status, expected 'negotiating'`);
+  }
+
+  const negotiationPrompt = NODE_PROMPTS.negotiating;
+  const previousResults = wf.agent_results || {};
+  const history = wf.negotiation_history || [];
+
+  // Add client message to history
+  const updatedHistory = [
+    ...history,
+    { role: "client", message, timestamp: new Date().toISOString() },
+  ];
+
+  const contextMessage = `
+PROJECT: ${wf.project_description || "No description"}
+CLIENT: ${wf.client_name || "Unknown"}
+QUOTE DATA: ${JSON.stringify(previousResults.quoting || {}, null, 2)}
+ARCHITECTURE: ${JSON.stringify(previousResults.architecting || {}, null, 2)}
+
+NEGOTIATION HISTORY:
+${updatedHistory.map((m: any) => `[${m.role}]: ${m.message}`).join("\n")}
+
+CLIENT'S LATEST MESSAGE: ${message}
+
+Respond to the client's message. Follow your negotiation rules strictly.`;
+
+  const result = await callClaude(negotiationPrompt, contextMessage);
+
+  // Extract response text
+  const agentResponse = result.response || result.raw_response || JSON.stringify(result);
+  const dealStatus = result.deal_status || "counter";
+
+  // Add agent response to history
+  updatedHistory.push({
+    role: "agent",
+    message: agentResponse,
+    timestamp: new Date().toISOString(),
+  });
+
+  // Determine if deal is agreed
+  const isAgreed = dealStatus === "accepted";
+
+  // Update workflow
+  await supabase.from("workflow_runs").update({
+    negotiation_history: updatedHistory,
+    final_agreed_quote: isAgreed ? (result.final_price ? { price: result.final_price, concessions: result.concessions } : previousResults.quoting) : wf.final_agreed_quote,
+    agent_results: { ...previousResults, latest_negotiation: result },
+  }).eq("id", workflowId);
+
+  // Log agent action
+  await supabase.from("agent_logs").insert({
+    agent_type: "negotiator",
+    action: "negotiation_response",
+    status: "completed",
+    details: { deal_status: dealStatus, message_count: updatedHistory.length },
+    project_id: wf.project_id || null,
+    user_id: wf.user_id || null,
+  });
+
+  return {
+    response: agentResponse,
+    deal_status: dealStatus,
+    negotiation_history: updatedHistory,
+    final_price: result.final_price || null,
+  };
+}
+
 // ── Main Handler ──
 
 serve(async (req) => {
@@ -419,6 +497,21 @@ serve(async (req) => {
       });
     }
 
+    // ── NEGOTIATE (client sends counter-offer / message) ──
+    if (action === "negotiate") {
+      const { workflow_id, negotiation_message } = body;
+      if (!workflow_id || !negotiation_message) {
+        return new Response(JSON.stringify({ error: "workflow_id and negotiation_message required" }), {
+          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      const result = await handleNegotiation(workflow_id, negotiation_message, supabase);
+      return new Response(JSON.stringify(result), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     // ── OVERRIDE (admin control) ──
     if (action === "override") {
       const { workflow_id, override: ov } = body;
@@ -455,7 +548,7 @@ serve(async (req) => {
       });
     }
 
-    return new Response(JSON.stringify({ error: "Unknown action. Use: start, advance, auto_advance, override, status" }), {
+    return new Response(JSON.stringify({ error: "Unknown action. Use: start, advance, auto_advance, negotiate, override, status" }), {
       status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
