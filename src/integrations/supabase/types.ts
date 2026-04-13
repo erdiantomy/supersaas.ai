@@ -173,12 +173,15 @@ export type Database = {
       }
       managed_agents: {
         Row: {
+          agent_native_score: number | null
           anthropic_agent_id: string | null
           created_at: string
           id: string
+          mcp_config: Json | null
           metadata: Json | null
           model: string
           name: string
+          sandbox_config: Json | null
           status: string
           system_prompt: string | null
           tools: Json
@@ -187,12 +190,15 @@ export type Database = {
           version: number
         }
         Insert: {
+          agent_native_score?: number | null
           anthropic_agent_id?: string | null
           created_at?: string
           id?: string
+          mcp_config?: Json | null
           metadata?: Json | null
           model?: string
           name: string
+          sandbox_config?: Json | null
           status?: string
           system_prompt?: string | null
           tools?: Json
@@ -201,12 +207,15 @@ export type Database = {
           version?: number
         }
         Update: {
+          agent_native_score?: number | null
           anthropic_agent_id?: string | null
           created_at?: string
           id?: string
+          mcp_config?: Json | null
           metadata?: Json | null
           model?: string
           name?: string
+          sandbox_config?: Json | null
           status?: string
           system_prompt?: string | null
           tools?: Json
@@ -684,10 +693,14 @@ export type Database = {
       }
       workflow_runs: {
         Row: {
+          agent_native_score: Json | null
+          agent_results: Json | null
           architecture_json: Json | null
           client_id: string | null
+          client_name: string | null
           created_at: string
           current_status: string
+          deployment_type: string | null
           final_agreed_quote: Json | null
           generated_code_bundle: string | null
           id: string
@@ -695,19 +708,26 @@ export type Database = {
           metadata: Json | null
           negotiation_history: Json | null
           planner_output: Json | null
+          project_description: string | null
           project_id: string | null
           quote_data: Json | null
           raw_client_prompt: string
+          status_history: Json | null
           stripe_session_id: string | null
           super_admin_override: Json | null
           updated_at: string
           user_id: string
+          validation_passed: boolean | null
         }
         Insert: {
+          agent_native_score?: Json | null
+          agent_results?: Json | null
           architecture_json?: Json | null
           client_id?: string | null
+          client_name?: string | null
           created_at?: string
           current_status?: string
+          deployment_type?: string | null
           final_agreed_quote?: Json | null
           generated_code_bundle?: string | null
           id?: string
@@ -715,19 +735,26 @@ export type Database = {
           metadata?: Json | null
           negotiation_history?: Json | null
           planner_output?: Json | null
+          project_description?: string | null
           project_id?: string | null
           quote_data?: Json | null
           raw_client_prompt?: string
+          status_history?: Json | null
           stripe_session_id?: string | null
           super_admin_override?: Json | null
           updated_at?: string
           user_id: string
+          validation_passed?: boolean | null
         }
         Update: {
+          agent_native_score?: Json | null
+          agent_results?: Json | null
           architecture_json?: Json | null
           client_id?: string | null
+          client_name?: string | null
           created_at?: string
           current_status?: string
+          deployment_type?: string | null
           final_agreed_quote?: Json | null
           generated_code_bundle?: string | null
           id?: string
@@ -735,13 +762,16 @@ export type Database = {
           metadata?: Json | null
           negotiation_history?: Json | null
           planner_output?: Json | null
+          project_description?: string | null
           project_id?: string | null
           quote_data?: Json | null
           raw_client_prompt?: string
+          status_history?: Json | null
           stripe_session_id?: string | null
           super_admin_override?: Json | null
           updated_at?: string
           user_id?: string
+          validation_passed?: boolean | null
         }
         Relationships: [
           {
