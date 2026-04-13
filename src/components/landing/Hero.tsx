@@ -90,7 +90,7 @@ export function Hero() {
         >
           <Bot size={14} className="text-primary glow-icon" />
           <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-          100% Autonomous AI Orchestra — Now Live
+          100% Agent-Native Platform — Now Live
         </motion.div>
 
         <motion.h1
@@ -100,11 +100,11 @@ export function Hero() {
           animate="visible"
           className="text-4xl sm:text-5xl md:text-7xl font-display font-bold tracking-tight mb-6 leading-[1.1]"
         >
-          <span className="text-gradient-white">AI Agents That Build,</span>
+          <span className="text-gradient-white">The Agent-Native</span>
           <br />
-          <span className="text-gradient-white">Deploy & Run Your</span>
+          <span className="text-gradient-white">Business Rebuilder.</span>
           <br />
-          <span className="text-gradient-green">Entire Business.</span>
+          <span className="text-gradient-green">MCP-Ready. Self-Optimizing.</span>
         </motion.h1>
 
         <motion.p
@@ -114,9 +114,9 @@ export function Hero() {
           animate="visible"
           className="text-lg md:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed"
         >
-          10× faster. 80% cheaper. Infinitely better than any software agency.
-          Our autonomous AI agent orchestra handles everything — from discovery to deployment — 
-          with zero human intervention.
+          The world's first Agent-Native Business Rebuilder.
+          Every UI action has an agent tool. Every agent has a sandbox.
+          MCP-compatible, self-optimizing — 10× faster, 80% cheaper than any agency.
         </motion.p>
 
         <motion.div
@@ -132,7 +132,7 @@ export function Hero() {
             whileTap={{ scale: 0.97 }}
             className="btn-primary flex items-center gap-2 w-full sm:w-auto justify-center"
           >
-            <Zap size={18} /> Start Free — Let AI Handle Everything
+            <Zap size={18} /> Rebuild Agent-Native — Start Free
           </motion.a>
           <motion.a
             href="#process"

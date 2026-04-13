@@ -34,8 +34,14 @@ export default function SubmitProject() {
 
     const { error } = await supabase.from("project_submissions").insert({
       user_id: user.id,
-      ...form,
-    } as any);
+      project_name: form.project_name,
+      project_type: form.project_type,
+      description: form.description,
+      budget_range: form.budget_range || null,
+      timeline: form.timeline || null,
+      features: form.features || null,
+      tech_requirements: form.tech_requirements || null,
+    });
 
     if (error) {
       toast({ title: "Error", description: error.message, variant: "destructive" });

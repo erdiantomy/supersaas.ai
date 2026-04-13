@@ -1,15 +1,12 @@
-import { LayoutDashboard, Users, FolderKanban, Milestone, LogOut, Home, Inbox, FileText, DollarSign, Send, Bot, Sparkles, Cpu } from "lucide-react";
+import {
+  LayoutDashboard, Users, FolderKanban, Milestone, LogOut, Home,
+  Inbox, FileText, DollarSign, Send, Bot, Sparkles, Cpu, Network
+} from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useAuth } from "@/hooks/useAuth";
 import {
-  Sidebar,
-  SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
+  Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent,
+  SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
 
@@ -22,6 +19,7 @@ const adminItems = [
   { title: "Milestones", url: "/dashboard/milestones", icon: Milestone },
   { title: "Payments", url: "/dashboard/payments", icon: DollarSign },
   { title: "Managed Agents", url: "/dashboard/managed-agents", icon: Cpu },
+  { title: "Agent-Native", url: "/dashboard/agent-native", icon: Network },
 ];
 
 const clientItems = [
@@ -54,7 +52,12 @@ export function DashboardSidebar() {
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <NavLink to={item.url} end className="hover:bg-muted/50" activeClassName="bg-muted text-primary font-medium">
+                    <NavLink
+                      to={item.url}
+                      end
+                      className="hover:bg-muted/50"
+                      activeClassName="bg-muted text-primary font-medium"
+                    >
                       <item.icon className="mr-2 h-4 w-4" />
                       {!collapsed && <span>{item.title}</span>}
                     </NavLink>

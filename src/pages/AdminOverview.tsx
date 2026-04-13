@@ -35,24 +35,29 @@ export default function AdminOverview() {
 
   useEffect(() => {
     async function load() {
-      const [{ count: clientCount }, { count: projectCount }, { data: payments }, { data: logs }, { data: pj }, { data: wf, count: wfCount }] =
-        await Promise.all([
-          supabase.from("clients").select("id", { count: "exact", head: true }),
-          supabase.from("projects").select("id", { count: "exact", head: true }),
-          supabase.from("payments").select("amount, status"),
-          supabase.from("agent_logs").select("*").order("created_at", { ascending: false }).limit(20),
-          supabase.from("projects").select("*, clients(name, company)").order("created_at", { ascending: false }).limit(10),
-          supabase.from("workflow_runs").select("*", { count: "exact" }).order("created_at", { ascending: false }).limit(20),
-        ]);
+      try {
+        const [{ count: clientCount }, { count: projectCount }, { data: payments }, { data: logs }, { data: pj }, { data: wf, count: wfCount }] =
+          await Promise.all([
+            supabase.from("clients").select("id", { count: "exact", head: true }),
+            supabase.from("projects").select("id", { count: "exact", head: true }),
+            supabase.from("payments").select("amount, status"),
+            supabase.from("agent_logs").select("*").order("created_at", { ascending: false }).limit(20),
+            supabase.from("projects").select("*, clients(name, company)").order("created_at", { ascending: false }).limit(10),
+            supabase.from("workflow_runs").select("*", { count: "exact" }).order("created_at", { ascending: false }).limit(20),
+          ]);
 
-      const revenue = (payments || [])
-        .filter((p: any) => p.status === "paid")
-        .reduce((sum: number, p: any) => sum + Number(p.amount), 0);
+        const revenue = (payments || [])
+          .filter((p: any) => p.status === "paid")
+          .reduce((sum: number, p: any) => sum + Number(p.amount), 0);
 
-      setStats({ clients: clientCount || 0, projects: projectCount || 0, revenue, agentRuns: (logs || []).length, workflows: wfCount || 0 });
-      setRecentLogs(logs || []);
-      setProjects(pj || []);
-      setWorkflows(wf || []);
+        setStats({ clients: clientCount || 0, projects: projectCount || 0, revenue, agentRuns: (logs || []).length, workflows: wfCount || 0 });
+        setRecentLogs(logs || []);
+        setProjects(pj || []);
+        setWorkflows(wf || []);
+      } catch (err) {
+        console.error("AdminOverview load error:", err);
+        toast.error("Failed to load dashboard data");
+      }
     }
     load();
 

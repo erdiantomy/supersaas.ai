@@ -5,7 +5,7 @@ import { NegotiationChat } from "@/components/dashboard/NegotiationChat";
 import { useAuth } from "@/hooks/useAuth";
 import { useAgentChat } from "@/hooks/useAgentChat";
 import { useWorkflowOrchestra, WorkflowStatus } from "@/hooks/useWorkflowOrchestra";
-import { Bot, Send, Sparkles, ArrowRight, CheckCircle2, Loader2, Zap, Brain, Calculator, HandshakeIcon, CreditCard, Code, TestTube, Rocket, Activity } from "lucide-react";
+import { Bot, Send, Sparkles, ArrowRight, CheckCircle2, Loader2, Zap, Brain, Calculator, HandshakeIcon, CreditCard, Code, TestTube, Rocket, Activity, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -13,7 +13,8 @@ import ReactMarkdown from "react-markdown";
 
 const WIZARD_STEPS = [
   { agent: "planner", label: "Discovery", description: "Tell us your business problem", icon: Brain, status: "planning" as WorkflowStatus },
-  { agent: "architect", label: "Architecture", description: "AI designs your solution", icon: Code, status: "architecting" as WorkflowStatus },
+  { agent: "architect", label: "Architecture", description: "AI designs agent-native solution", icon: Code, status: "architecting" as WorkflowStatus },
+  { agent: "validator", label: "Validation", description: "Agent-native compliance check", icon: ShieldCheck, status: "validating" as WorkflowStatus },
   { agent: "negotiator", label: "Proposal", description: "Review scope & pricing", icon: Calculator, status: "quoting" as WorkflowStatus },
 ];
 
@@ -21,6 +22,7 @@ const PIPELINE_STAGES: { status: WorkflowStatus; label: string; icon: any }[] = 
   { status: "intake", label: "Intake", icon: Sparkles },
   { status: "planning", label: "Planning", icon: Brain },
   { status: "architecting", label: "Architecture", icon: Code },
+  { status: "validating", label: "Validation", icon: ShieldCheck },
   { status: "quoting", label: "Quoting", icon: Calculator },
   { status: "negotiating", label: "Negotiation", icon: HandshakeIcon },
   { status: "paid", label: "Payment", icon: CreditCard },

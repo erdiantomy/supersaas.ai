@@ -14,24 +14,24 @@ const agents = [
   {
     icon: Cpu,
     title: "Architect Agent",
-    desc: "Designs database schemas, API contracts, and component hierarchies from your business rules. Reviewed by senior engineers.",
-    metrics: "Blueprint delivered in 48hrs",
+    desc: "Designs agent-native schemas with MCP server, tool parity matrix, and sandbox governance. Every UI action gets an agent tool.",
+    metrics: "Full MCP blueprint in 48hrs",
     color: "from-[hsl(280,100%,65%)] to-[hsl(300,100%,70%)]",
     glowColor: "hsl(280 100% 65% / 0.15)",
   },
   {
     icon: Users,
     title: "Builder Swarm",
-    desc: "Multiple specialized agents write frontend, backend, tests, and migrations in parallel. Human engineers review every commit.",
+    desc: "Multiple specialized agents write frontend, backend, MCP server, and tests in parallel. Agent-native architecture from line one.",
     metrics: "12 agents working simultaneously",
     color: "from-primary to-[hsl(170,80%,55%)]",
     glowColor: "hsl(152 100% 45% / 0.15)",
   },
   {
     icon: ShieldCheck,
-    title: "QA Agent",
-    desc: "Automated regression testing, load testing, and security scanning before every deployment. Zero-bug tolerance.",
-    metrics: "847 automated tests avg. per project",
+    title: "Agent-Native Validator",
+    desc: "Scores every build across 6 agent-native dimensions: MCP compatibility, tool parity, API discoverability, sandbox governance, files-as-interface, self-optimization.",
+    metrics: "Must pass 80/100 to ship",
     color: "from-[hsl(45,100%,60%)] to-[hsl(30,100%,55%)]",
     glowColor: "hsl(45 100% 60% / 0.15)",
   },
@@ -54,11 +54,11 @@ export function AgentStack() {
         >
           <span className="reveal-line" />
           <h2 className="text-3xl md:text-5xl font-display font-bold mb-6">
-            The Agent Stack
+            The Agent-Native Stack
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Four autonomous AI agents work in concert — each specialized, each supervised by senior engineers. 
-            This is how we deliver enterprise systems in weeks, not months.
+            Four autonomous AI agents work in concert — MCP-compatible, sandbox-governed, and self-optimizing. 
+            Every system we deliver is agent-native by default.
           </p>
         </motion.div>
 

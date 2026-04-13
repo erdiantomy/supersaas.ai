@@ -71,7 +71,7 @@ export function Navbar() {
           whileTap={{ scale: 0.95 }}
           className="hidden md:inline-flex btn-primary text-sm items-center gap-2"
         >
-          <Zap size={14} /> Launch Orchestra
+          <Zap size={14} /> Start Agent-Native
         </motion.a>
 
         <button
@@ -114,7 +114,7 @@ export function Navbar() {
                 transition={{ delay: navLinks.length * 0.07 }}
                 className="btn-primary text-center text-sm mt-2 flex items-center justify-center gap-2"
               >
-                <Zap size={14} /> Launch Orchestra
+                <Zap size={14} /> Start Agent-Native
               </motion.a>
             </div>
           </motion.div>

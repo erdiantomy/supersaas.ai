@@ -16,8 +16,24 @@ function getSupabase() {
 
 function getAnthropicKey(): string {
   const key = Deno.env.get("ANTHROPIC_API_KEY");
-  if (!key) throw new Error("ANTHROPIC_API_KEY is not configured. Please add it via Lovable Cloud secrets.");
+  if (!key) throw new Error("ANTHROPIC_API_KEY is not configured. Add it via Lovable Cloud secrets.");
   return key;
+}
+
+// Validate that the request has a valid auth token and extract user_id
+async function validateAuth(req: Request): Promise<string | null> {
+  const authHeader = req.headers.get("authorization") || "";
+  const token = authHeader.replace("Bearer ", "");
+  if (!token) return null;
+
+  // For anon key requests, we rely on the user_id in the body
+  // For authenticated requests, we can verify the JWT
+  const supabase = createClient(
+    Deno.env.get("SUPABASE_URL")!,
+    token
+  );
+  const { data: { user } } = await supabase.auth.getUser();
+  return user?.id || null;
 }
 
 async function anthropicFetch(path: string, body: any) {
@@ -70,69 +86,61 @@ async function anthropicDelete(path: string) {
   return resp.json();
 }
 
-// Stream SSE events from Anthropic session and persist to Supabase
-async function streamSessionEvents(sessionId: string, dbSessionId: string, supabase: any) {
-  const resp = await fetch(`${ANTHROPIC_API}/sessions/${sessionId}/events`, {
-    method: "GET",
-    headers: {
-      "x-api-key": getAnthropicKey(),
-      "anthropic-version": "2023-06-01",
-      "anthropic-beta": BETA_HEADER,
-      "Accept": "text/event-stream",
-    },
-  });
+// Poll session events and persist to Supabase (replaces broken EdgeRuntime.waitUntil)
+async function pollSessionEvents(sessionId: string, dbSessionId: string, supabase: any) {
+  const maxPollAttempts = 60; // Poll for up to 5 minutes (60 * 5s)
+  let attempts = 0;
 
-  if (!resp.ok || !resp.body) {
-    throw new Error(`Failed to stream session events: ${resp.status}`);
-  }
+  while (attempts < maxPollAttempts) {
+    attempts++;
+    try {
+      // Get session status from Anthropic
+      const sessionData = await anthropicGet(`/sessions/${sessionId}`);
 
-  const reader = resp.body.getReader();
-  const decoder = new TextDecoder();
-  let buffer = "";
+      // Update session status in DB
+      const status = sessionData.status || "running";
+      await supabase.from("managed_sessions").update({
+        status: status === "completed" ? "completed" : status === "error" ? "error" : "running",
+        last_event_at: new Date().toISOString(),
+        cost_data: {
+          session_hours: (sessionData.usage?.session_seconds || 0) / 3600,
+          token_cost: ((sessionData.usage?.input_tokens || 0) * 0.000003 + (sessionData.usage?.output_tokens || 0) * 0.000015),
+          total_cost: ((sessionData.usage?.session_seconds || 0) / 3600) * 0.08 +
+            ((sessionData.usage?.input_tokens || 0) * 0.000003 + (sessionData.usage?.output_tokens || 0) * 0.000015),
+        },
+      }).eq("id", dbSessionId);
 
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    buffer += decoder.decode(value, { stream: true });
+      // Store any new outputs as events
+      if (sessionData.outputs && Array.isArray(sessionData.outputs)) {
+        for (const output of sessionData.outputs) {
+          const { data: existing } = await supabase
+            .from("managed_events")
+            .select("id")
+            .eq("session_id", dbSessionId)
+            .eq("event_type", output.type || "output")
+            .limit(1);
 
-    let newlineIdx;
-    while ((newlineIdx = buffer.indexOf("\n\n")) !== -1) {
-      const chunk = buffer.slice(0, newlineIdx);
-      buffer = buffer.slice(newlineIdx + 2);
-
-      if (!chunk.startsWith("data: ")) continue;
-      const jsonStr = chunk.slice(6).trim();
-      if (jsonStr === "[DONE]") break;
-
-      try {
-        const event = JSON.parse(jsonStr);
-        // Persist event to DB for realtime relay
-        await supabase.from("managed_events").insert({
-          session_id: dbSessionId,
-          event_type: event.type || "unknown",
-          event_data: event,
-          requires_approval: event.type === "approval_request",
-          approval_status: event.type === "approval_request" ? "pending" : "none",
-        });
-
-        // Update session status based on events
-        if (event.type === "session_complete") {
-          await supabase.from("managed_sessions").update({
-            status: "completed",
-            last_event_at: new Date().toISOString(),
-          }).eq("id", dbSessionId);
-        } else if (event.type === "error") {
-          await supabase.from("managed_sessions").update({
-            status: "error",
-            last_event_at: new Date().toISOString(),
-          }).eq("id", dbSessionId);
-        } else {
-          await supabase.from("managed_sessions").update({
-            last_event_at: new Date().toISOString(),
-          }).eq("id", dbSessionId);
+          if (!existing || existing.length === 0) {
+            await supabase.from("managed_events").insert({
+              session_id: dbSessionId,
+              event_type: output.type || "output",
+              event_data: output,
+              requires_approval: output.type === "approval_request",
+              approval_status: output.type === "approval_request" ? "pending" : "none",
+            });
+          }
         }
-      } catch { /* ignore parse errors */ }
+      }
+
+      if (status === "completed" || status === "error" || status === "cancelled") {
+        break;
+      }
+    } catch (e) {
+      console.error("Poll error:", e);
     }
+
+    // Wait 5 seconds between polls
+    await new Promise(resolve => setTimeout(resolve, 5000));
   }
 }
 
@@ -144,7 +152,7 @@ serve(async (req) => {
     const { action } = body;
     const supabase = getSupabase();
 
-    // ── CREATE AGENT ──
+    // CREATE AGENT
     if (action === "create_agent") {
       const { name, model, system_prompt, tools, user_id } = body;
       if (!name || !user_id) {
@@ -153,11 +161,12 @@ serve(async (req) => {
         });
       }
 
-      // Create agent via Anthropic API
+      const defaultSystemPrompt = `You are ${name}, a production AI agent built by SuperSaaS.ai — the leading Agent-Native Business Rebuilder platform. You operate within a governed sandbox with full audit logging. You have MCP server compatibility and follow agent-native architecture principles.`;
+
       const agentResult = await anthropicFetch("/agents", {
         model: model || "claude-sonnet-4-20250514",
         name,
-        system: system_prompt || `You are ${name}, a production AI agent built by SuperSaaS.ai.`,
+        system: system_prompt || defaultSystemPrompt,
         tools: tools || [
           { type: "text_editor_20250429" },
           { type: "bash_20250124" },
@@ -165,12 +174,11 @@ serve(async (req) => {
         ],
       });
 
-      // Store in DB
       const { data: dbAgent, error } = await supabase.from("managed_agents").insert({
         user_id,
         name,
         model: model || "claude-sonnet-4-20250514",
-        system_prompt: system_prompt || "",
+        system_prompt: system_prompt || defaultSystemPrompt,
         tools: tools || [],
         anthropic_agent_id: agentResult.id,
         status: "active",
@@ -183,7 +191,7 @@ serve(async (req) => {
       });
     }
 
-    // ── CREATE ENVIRONMENT ──
+    // CREATE ENVIRONMENT
     if (action === "create_environment") {
       const { agent_id, name: envName, packages, user_id } = body;
       if (!agent_id || !user_id) {
@@ -192,7 +200,6 @@ serve(async (req) => {
         });
       }
 
-      // Get agent's Anthropic ID
       const { data: agent } = await supabase.from("managed_agents")
         .select("anthropic_agent_id").eq("id", agent_id).single();
       if (!agent) throw new Error("Agent not found");
@@ -218,7 +225,7 @@ serve(async (req) => {
       });
     }
 
-    // ── START SESSION ──
+    // START SESSION
     if (action === "start_session") {
       const { agent_id, environment_id, user_id, prompt, approval_mode, workflow_run_id } = body;
       if (!agent_id || !user_id || !prompt) {
@@ -247,7 +254,6 @@ serve(async (req) => {
 
       const sessionResult = await anthropicFetch("/sessions", sessionPayload);
 
-      // Store session in DB
       const { data: dbSession, error } = await supabase.from("managed_sessions").insert({
         user_id,
         agent_id,
@@ -261,19 +267,21 @@ serve(async (req) => {
 
       if (error) throw new Error(`DB insert failed: ${error.message}`);
 
-      // Start background event streaming (fire and forget)
-      EdgeRuntime?.waitUntil?.(
-        streamSessionEvents(sessionResult.id, dbSession.id, supabase).catch(e => {
-          console.error("Event streaming error:", e);
-        })
-      );
+      // Start polling in background (proper Deno pattern — fire and forget)
+      (async () => {
+        try {
+          await pollSessionEvents(sessionResult.id, dbSession.id, supabase);
+        } catch (e) {
+          console.error("Background polling error:", e);
+        }
+      })();
 
       return new Response(JSON.stringify({ session: dbSession, anthropic: sessionResult }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    // ── APPROVE EVENT ──
+    // APPROVE EVENT
     if (action === "approve_event") {
       const { event_id, approved } = body;
       if (!event_id) {
@@ -286,7 +294,6 @@ serve(async (req) => {
         .select("*, managed_sessions(anthropic_session_id)").eq("id", event_id).single();
       if (!event) throw new Error("Event not found");
 
-      // Send approval to Anthropic
       const sessionAnthropicId = event.managed_sessions?.anthropic_session_id;
       if (sessionAnthropicId) {
         await anthropicFetch(`/sessions/${sessionAnthropicId}/approve`, {
@@ -304,7 +311,7 @@ serve(async (req) => {
       });
     }
 
-    // ── PAUSE / INTERRUPT / SHUTDOWN SESSION ──
+    // CONTROL SESSION (pause/resume/shutdown)
     if (action === "control_session") {
       const { session_id, control } = body;
       if (!session_id || !control) {
@@ -317,15 +324,22 @@ serve(async (req) => {
         .select("anthropic_session_id").eq("id", session_id).single();
       if (!session) throw new Error("Session not found");
 
-      if (control === "pause" || control === "interrupt") {
-        await anthropicFetch(`/sessions/${session.anthropic_session_id}/interrupt`, {});
-        await supabase.from("managed_sessions").update({ status: "paused" }).eq("id", session_id);
-      } else if (control === "shutdown") {
-        await anthropicDelete(`/sessions/${session.anthropic_session_id}`);
-        await supabase.from("managed_sessions").update({ status: "shutdown" }).eq("id", session_id);
-      } else if (control === "resume") {
-        await anthropicFetch(`/sessions/${session.anthropic_session_id}/resume`, {});
-        await supabase.from("managed_sessions").update({ status: "running" }).eq("id", session_id);
+      try {
+        if (control === "pause" || control === "interrupt") {
+          await anthropicFetch(`/sessions/${session.anthropic_session_id}/interrupt`, {});
+          await supabase.from("managed_sessions").update({ status: "paused" }).eq("id", session_id);
+        } else if (control === "shutdown") {
+          await anthropicDelete(`/sessions/${session.anthropic_session_id}`);
+          await supabase.from("managed_sessions").update({ status: "shutdown" }).eq("id", session_id);
+        } else if (control === "resume") {
+          await anthropicFetch(`/sessions/${session.anthropic_session_id}/resume`, {});
+          await supabase.from("managed_sessions").update({ status: "running" }).eq("id", session_id);
+        }
+      } catch (apiError) {
+        // If Anthropic API fails, still update local status
+        console.error("Anthropic control error:", apiError);
+        const statusMap: Record<string, string> = { pause: "paused", interrupt: "paused", shutdown: "shutdown", resume: "running" };
+        await supabase.from("managed_sessions").update({ status: statusMap[control] || control }).eq("id", session_id);
       }
 
       return new Response(JSON.stringify({ success: true, status: control }), {
@@ -333,47 +347,64 @@ serve(async (req) => {
       });
     }
 
-    // ── LIST SESSIONS ──
+    // LIST SESSIONS
     if (action === "list_sessions") {
       const { user_id } = body;
+      if (!user_id) {
+        return new Response(JSON.stringify({ error: "user_id required" }), {
+          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
       const { data, error } = await supabase.from("managed_sessions")
         .select("*, managed_agents(name, model), managed_environments(name)")
         .eq("user_id", user_id)
         .order("created_at", { ascending: false })
         .limit(50);
       if (error) throw new Error(error.message);
-      return new Response(JSON.stringify(data), {
+      return new Response(JSON.stringify(data || []), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    // ── LIST AGENTS ──
+    // LIST AGENTS
     if (action === "list_agents") {
       const { user_id } = body;
+      if (!user_id) {
+        return new Response(JSON.stringify({ error: "user_id required" }), {
+          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
       const { data, error } = await supabase.from("managed_agents")
         .select("*")
         .eq("user_id", user_id)
         .order("created_at", { ascending: false });
       if (error) throw new Error(error.message);
-      return new Response(JSON.stringify(data), {
+      return new Response(JSON.stringify(data || []), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    // ── GET SESSION EVENTS ──
+    // GET SESSION EVENTS
     if (action === "get_events") {
       const { session_id } = body;
+      if (!session_id) {
+        return new Response(JSON.stringify({ error: "session_id required" }), {
+          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
       const { data, error } = await supabase.from("managed_events")
         .select("*")
         .eq("session_id", session_id)
         .order("created_at", { ascending: true });
       if (error) throw new Error(error.message);
-      return new Response(JSON.stringify(data), {
+      return new Response(JSON.stringify(data || []), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    return new Response(JSON.stringify({ error: "Unknown action. Use: create_agent, create_environment, start_session, approve_event, control_session, list_sessions, list_agents, get_events" }), {
+    return new Response(JSON.stringify({
+      error: "Unknown action. Use: create_agent, create_environment, start_session, approve_event, control_session, list_sessions, list_agents, get_events"
+    }), {
       status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {

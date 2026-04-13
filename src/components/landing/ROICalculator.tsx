@@ -157,7 +157,7 @@ export function ROICalculator() {
                   {[
                     { label: "Current SaaS Stack", value: results.currentAnnual, color: "bg-destructive/60" },
                     { label: "Traditional Agency", value: results.agencyAnnual, color: "bg-muted-foreground/40" },
-                    { label: "SuperSaaS.ai", value: results.superSaasAnnual, color: "bg-primary" },
+                    { label: "Agent-Native Rebuild", value: results.superSaasAnnual, color: "bg-primary" },
                   ].map((item) => {
                     const maxVal = Math.max(results.currentAnnual, results.agencyAnnual);
                     const width = Math.max(8, (item.value / maxVal) * 100);

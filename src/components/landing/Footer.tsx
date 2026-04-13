@@ -34,7 +34,7 @@ export function Footer() {
             </div>
 
             <div className="text-xs text-muted-foreground/40">
-              © {new Date().getFullYear()} Super SaaS. All rights reserved.
+              © {new Date().getFullYear()} SuperSaaS.ai — The Agent-Native Business Rebuilder. All rights reserved.
             </div>
           </div>
         </div>

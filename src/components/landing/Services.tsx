@@ -8,37 +8,37 @@ const domains = [
   {
     icon: ShoppingBag,
     title: "Retail & Commerce",
-    desc: "Unified inventory, POS, and omnichannel — from single storefront to 100+ branches. Replace 4 SaaS tools with one system you own.",
-    tags: ["Unified Inventory", "Omnichannel POS", "Loyalty Engine"],
+    desc: "Agent-native POS, inventory, and omnichannel — every operation has an agent tool. Replace 4 SaaS tools with one system you own.",
+    tags: ["Agent-Native POS", "MCP-Ready Inventory", "Self-Optimizing Loyalty"],
     image: demoErp,
     features: [
       "Multi-branch inventory with real-time sync across 50+ locations",
       "Offline-first POS with automatic cloud reconciliation",
-      "Custom loyalty programs with AI-driven customer segmentation",
+      "AI agents that auto-optimize pricing and customer segmentation",
     ],
   },
   {
     icon: Truck,
     title: "Logistics & Supply Chain",
-    desc: "Route optimization, warehouse management, and real-time fleet tracking — purpose-built for your operational complexity.",
-    tags: ["Route Optimization", "Warehouse Mgmt", "Fleet Tracking"],
+    desc: "Agent-native route optimization, warehouse management, and fleet tracking — self-optimizing agents run your operations 24/7.",
+    tags: ["Agent-Native Routing", "MCP Warehouse", "Self-Optimizing Fleet"],
     image: demoPos,
     features: [
       "AI-optimized delivery routes saving 30% on fuel costs",
-      "Barcode/RFID warehouse management with pick-pack-ship workflows",
-      "Real-time GPS fleet tracking with automated dispatch",
+      "Barcode/RFID warehouse with agent-callable pick-pack-ship tools",
+      "Real-time fleet tracking with autonomous dispatch agents",
     ],
   },
   {
     icon: Landmark,
     title: "Financial Services",
-    desc: "Compliance engines, portfolio analytics, and payment orchestration — built for regulatory rigor and high-throughput processing.",
-    tags: ["Compliance Engine", "Portfolio Analytics", "Payment Orchestration"],
+    desc: "Agent-native compliance, portfolio analytics, and payment orchestration — sandbox-governed agents with full audit trails.",
+    tags: ["Agent-Native Compliance", "Sandboxed Analytics", "MCP Payments"],
     image: demoSaas,
     features: [
-      "Automated KYC/AML compliance with audit trail",
-      "Real-time portfolio analytics with risk scoring",
-      "Multi-gateway payment orchestration with failover",
+      "Automated KYC/AML compliance with agent audit trail",
+      "Self-optimizing portfolio analytics with risk scoring",
+      "Multi-gateway payment orchestration with agent failover",
     ],
   },
 ];
@@ -46,8 +46,8 @@ const domains = [
 const extraDomain = {
   icon: HeartPulse,
   title: "Healthcare & Operations",
-  desc: "Patient flow optimization, scheduling intelligence, and regulatory compliance — HIPAA-ready from architecture to deployment.",
-  tags: ["Patient Flow", "Smart Scheduling", "HIPAA Compliant"],
+  desc: "Agent-native patient flow, scheduling intelligence, and regulatory compliance — HIPAA-ready with sandbox governance from day one.",
+  tags: ["Agent-Native Scheduling", "Sandboxed HIPAA", "Self-Optimizing Ops"],
 };
 
 export function Services() {

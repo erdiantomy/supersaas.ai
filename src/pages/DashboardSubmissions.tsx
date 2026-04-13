@@ -47,7 +47,7 @@ export default function DashboardSubmissions() {
   useEffect(() => { load(); }, []);
 
   const handleStatusChange = async (id: string, status: string) => {
-    await supabase.from("project_submissions").update({ status } as any).eq("id", id);
+    await supabase.from("project_submissions").update({ status }).eq("id", id);
     load();
     toast({ title: `Submission ${status}` });
   };

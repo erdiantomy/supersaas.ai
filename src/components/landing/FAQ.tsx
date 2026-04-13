@@ -4,36 +4,36 @@ import { motion, AnimatePresence } from "framer-motion";
 
 const faqs = [
   {
+    q: "What does 'agent-native' actually mean?",
+    a: "Agent-native means your system is built from the ground up so AI agents can operate it — not just humans. Every UI action has a corresponding agent tool. Every API is self-documenting. Every agent runs in an isolated sandbox with audit logging. Your system exposes an MCP server so any external AI can discover and use its capabilities.",
+  },
+  {
     q: "How do I know you'll actually deliver?",
     a: "We structure every project in milestones with a live staging environment after each sprint. You see working software every 2 weeks. We also offer fixed-price contracts so there are no cost overruns.",
   },
   {
-    q: "What AI models do you use?",
-    a: "We orchestrate multiple frontier models — GPT-5, Gemini 2.5 Pro, Claude 4 — each selected for specific tasks. Discovery uses language models. Architecture uses code-specialized models. QA uses security-focused models. The right tool for each job.",
+    q: "What is MCP (Model Context Protocol)?",
+    a: "MCP is the open standard for AI agents to discover and use tools. We auto-generate an MCP server for every system we build, meaning any AI — Claude, GPT, Gemini, or your own — can interact with your business system programmatically. It's like giving your business an API that AI agents natively understand.",
   },
   {
-    q: "Is my data safe?",
-    a: "Absolutely. We run a SOC2-compliant pipeline. Your data never leaves your cloud infrastructure. We support data residency requirements for EU, APAC, and US regions. HIPAA-ready architectures available for healthcare clients.",
+    q: "Is my data safe with agents running?",
+    a: "Every agent runs in a governed sandbox with memory limits, network restrictions, and full audit logging. We follow the principle that 'every agent needs a box.' SOC2-compliant pipeline, data residency support for EU/APAC/US, and HIPAA-ready architectures for healthcare.",
   },
   {
-    q: "What happens if AI makes a mistake?",
-    a: "Every agent output is validated by our QA Agent layer and human engineer review checkpoints. Our Builder Swarm generates 800+ automated tests per project. We maintain a zero-bug tolerance policy before production deployment.",
+    q: "What happens if an agent makes a mistake?",
+    a: "Every agent output passes through our Agent-Native Validator, which scores the build across 6 dimensions. Builds must score 80/100+ to ship. Agents requiring dangerous operations trigger human-in-the-loop approval gates. You stay in control.",
   },
   {
     q: "What if I need changes after launch?",
-    a: "The code is yours — you own it completely. Our Scale and Enterprise plans include Managed AI Ops where agents continuously monitor, suggest improvements, and implement changes. Or hand it to your own developers. No lock-in, ever.",
+    a: "The code is yours — you own it completely. Agent-Native Rebuild includes self-optimizing agents that continuously monitor, suggest improvements, and auto-apply safe changes. Risky changes go through your approval queue. Or hand it to your own developers. No lock-in.",
   },
   {
     q: "How is this faster than a traditional agency?",
-    a: "Traditional agencies assign 3-5 developers working sequentially. We deploy 8-16 AI agents working in parallel — frontend, backend, tests, and migrations simultaneously. Human engineers supervise and handle the complex business logic and edge cases.",
+    a: "Traditional agencies assign 3-5 developers working sequentially. We deploy 12+ AI agents working in parallel — MCP server, frontend, backend, agent tools, tests, and migrations simultaneously. Human engineers supervise edge cases.",
   },
   {
-    q: "Can I bring my own AI keys (BYOK)?",
-    a: "Yes. Enterprise clients can use their own API keys for AI model access. This gives you full control over usage, billing, and data governance. We support OpenAI, Google, and Anthropic BYOK configurations.",
-  },
-  {
-    q: "What's the minimum budget I need?",
-    a: "Our Launch tier starts at $12,000 for an MVP with up to 5 modules, delivered in 4 weeks. Enterprise systems with full agent fleets and managed operations are custom-quoted. We'll give you an honest estimate on the architecture call.",
+    q: "What's the minimum budget?",
+    a: "Agent-Native Rebuild starts at $4,999 setup + $999/mo for managed operations. Traditional Launch tier starts at $12,000 one-time. Enterprise systems with dedicated agent fleets are custom-quoted.",
   },
 ];
 

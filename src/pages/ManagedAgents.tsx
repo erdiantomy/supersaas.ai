@@ -71,9 +71,16 @@ export default function ManagedAgents() {
 
   // Realtime subscription for session updates
   useEffect(() => {
+    if (!user?.id) return;
+
     const ch = supabase
       .channel("managed-sessions-rt")
-      .on("postgres_changes", { event: "*", schema: "public", table: "managed_sessions" }, (payload) => {
+      .on("postgres_changes", {
+        event: "*",
+        schema: "public",
+        table: "managed_sessions",
+        filter: `user_id=eq.${user.id}`,
+      }, (payload) => {
         if (payload.eventType === "UPDATE") {
           setSessions(prev => prev.map(s => s.id === (payload.new as any).id ? { ...s, ...payload.new } : s));
         } else if (payload.eventType === "INSERT") {
@@ -93,7 +100,7 @@ export default function ManagedAgents() {
       .subscribe();
 
     return () => { supabase.removeChannel(ch); supabase.removeChannel(ch2); };
-  }, [selectedSession]);
+  }, [selectedSession, user?.id]);
 
   const loadEvents = async (sessionId: string) => {
     setSelectedSession(sessionId);
