@@ -1,0 +1,26 @@
+{
+  "name": "growth-os-v3",
+  "version": "3.1.0",
+  "description": "Growth OS — autonomous ROAS + cash-flow loop for Indonesian SMBs",
+  "scripts": {
+    "dev": "tsx src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "hono": "^4.6.20",
+    "@hono/zod-validator": "^0.5.0",
+    "drizzle-orm": "^0.39.0",
+    "postgres": "^3.4.5",
+    "zod": "^3.24.2",
+    "node-cron": "^3.0.3",
+    "axios": "^1.8.4"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.3",
+    "typescript": "^5.7.3",
+    "@types/node": "^22.13.10",
+    "@types/node-cron": "^3.0.11"
+  }
+}
