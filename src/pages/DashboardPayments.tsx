@@ -78,9 +78,9 @@ export default function DashboardPayments() {
     load();
   };
 
-  const handleStatusChange = async (id: string, status: string) => {
-    const update: Record<string, string> = { status };
-    if (status === "paid") update.paid_at = new Date().toISOString();
+  const handleStatusChange = async (id: string, newStatus: string) => {
+    const update: { status: string; paid_at?: string } = { status: newStatus };
+    if (newStatus === "paid") update.paid_at = new Date().toISOString();
     await supabase.from("payments").update(update).eq("id", id);
     load();
   };
