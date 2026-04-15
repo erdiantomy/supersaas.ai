@@ -32,10 +32,10 @@ Deno.serve(async (req) => {
     const body = await req.json()
     console.log('Xendit webhook received:', JSON.stringify(body))
 
-    const { external_id, status, paid_at, paid_amount, payment_method, payment_channel } = body
+    const { id: xenditId, external_id, status, paid_at, paid_amount, payment_method, payment_channel } = body
 
-    if (!external_id) {
-      return new Response(JSON.stringify({ error: 'Missing external_id' }), {
+    if (!xenditId) {
+      return new Response(JSON.stringify({ error: 'Missing invoice id' }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })
@@ -57,7 +57,7 @@ Deno.serve(async (req) => {
     const { error } = await supabase
       .from('payments')
       .update(update)
-      .eq('id', external_id)
+      .eq('xendit_invoice_id', xenditId)
 
     if (error) {
       console.error('DB update error:', error)
@@ -67,7 +67,7 @@ Deno.serve(async (req) => {
       })
     }
 
-    console.log(`Payment ${external_id} updated to ${paymentStatus}`)
+    console.log(`Payment with xendit_invoice_id ${xenditId} updated to ${paymentStatus}`)
 
     return new Response(JSON.stringify({ success: true }), {
       status: 200,
