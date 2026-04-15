@@ -430,6 +430,8 @@ export type Database = {
           project_id: string | null
           revenuecat_id: string | null
           status: string
+          xendit_invoice_id: string | null
+          xendit_invoice_url: string | null
         }
         Insert: {
           amount: number
@@ -442,6 +444,8 @@ export type Database = {
           project_id?: string | null
           revenuecat_id?: string | null
           status?: string
+          xendit_invoice_id?: string | null
+          xendit_invoice_url?: string | null
         }
         Update: {
           amount?: number
@@ -454,6 +458,8 @@ export type Database = {
           project_id?: string | null
           revenuecat_id?: string | null
           status?: string
+          xendit_invoice_id?: string | null
+          xendit_invoice_url?: string | null
         }
         Relationships: [
           {
