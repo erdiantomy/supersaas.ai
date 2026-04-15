@@ -1,14 +1,13 @@
 import { useEffect, useState } from "react";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { supabase } from "@/integrations/supabase/client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { DollarSign, Plus, TrendingUp, Clock, CheckCircle2 } from "lucide-react";
+import { Plus, TrendingUp, Clock, CheckCircle2, Send, ExternalLink, Loader2 } from "lucide-react";
 
 interface Payment {
   id: string;
@@ -19,38 +18,40 @@ interface Payment {
   status: string;
   description: string | null;
   revenuecat_id: string | null;
+  xendit_invoice_id: string | null;
+  xendit_invoice_url: string | null;
   paid_at: string | null;
   created_at: string;
   projects?: { title: string } | null;
-  clients?: { name: string } | null;
+  clients?: { name: string; email: string | null } | null;
 }
 
 export default function DashboardPayments() {
   const [payments, setPayments] = useState<Payment[]>([]);
   const [projects, setProjects] = useState<{ id: string; title: string }[]>([]);
-  const [clients, setClients] = useState<{ id: string; name: string }[]>([]);
+  const [clients, setClients] = useState<{ id: string; name: string; email: string | null }[]>([]);
   const [open, setOpen] = useState(false);
+  const [sendingInvoice, setSendingInvoice] = useState<string | null>(null);
   const [form, setForm] = useState({
     project_id: "",
     client_id: "",
     amount: "",
-    currency: "USD",
+    currency: "IDR",
     status: "pending",
     description: "",
-    revenuecat_id: "",
   });
   const { toast } = useToast();
 
   const load = async () => {
     const { data } = await supabase
       .from("payments")
-      .select("*, projects(title), clients(name)")
+      .select("*, projects(title), clients(name, email)")
       .order("created_at", { ascending: false });
     setPayments((data as Payment[]) ?? []);
 
     const { data: pj } = await supabase.from("projects").select("id, title");
     setProjects(pj ?? []);
-    const { data: cl } = await supabase.from("clients").select("id, name");
+    const { data: cl } = await supabase.from("clients").select("id, name, email");
     setClients(cl ?? []);
   };
 
@@ -65,7 +66,6 @@ export default function DashboardPayments() {
       currency: form.currency,
       status: form.status,
       description: form.description || null,
-      revenuecat_id: form.revenuecat_id || null,
       paid_at: form.status === "paid" ? new Date().toISOString() : null,
     });
     if (error) {
@@ -73,20 +73,63 @@ export default function DashboardPayments() {
       return;
     }
     toast({ title: "Payment recorded" });
-    setForm({ project_id: "", client_id: "", amount: "", currency: "USD", status: "pending", description: "", revenuecat_id: "" });
+    setForm({ project_id: "", client_id: "", amount: "", currency: "IDR", status: "pending", description: "" });
     setOpen(false);
     load();
   };
 
   const handleStatusChange = async (id: string, status: string) => {
-    const update: any = { status };
+    const update: Record<string, string> = { status };
     if (status === "paid") update.paid_at = new Date().toISOString();
     await supabase.from("payments").update(update).eq("id", id);
     load();
   };
 
+  const handleSendInvoice = async (payment: Payment) => {
+    setSendingInvoice(payment.id);
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData?.session?.access_token;
+
+      const res = await supabase.functions.invoke("xendit-create-invoice", {
+        body: {
+          payment_id: payment.id,
+          amount: payment.amount,
+          currency: payment.currency,
+          description: payment.description || `Payment for ${payment.projects?.title || "project"}`,
+          client_email: payment.clients?.email,
+          client_name: payment.clients?.name,
+        },
+      });
+
+      if (res.error) {
+        throw new Error(res.error.message || "Failed to create invoice");
+      }
+
+      const invoiceUrl = res.data?.invoice_url;
+      toast({ title: "Invoice created!", description: "Payment link is ready to share." });
+
+      // Open invoice URL
+      if (invoiceUrl) {
+        window.open(invoiceUrl, "_blank");
+      }
+
+      load();
+    } catch (err: any) {
+      toast({ title: "Error", description: err.message, variant: "destructive" });
+    } finally {
+      setSendingInvoice(null);
+    }
+  };
+
+  const formatAmount = (amount: number, currency: string) => {
+    if (currency === "IDR") return `Rp ${Number(amount).toLocaleString("id-ID")}`;
+    return `$${Number(amount).toFixed(2)}`;
+  };
+
   const totalRevenue = payments.filter((p) => p.status === "paid").reduce((sum, p) => sum + Number(p.amount), 0);
   const pendingAmount = payments.filter((p) => p.status === "pending").reduce((sum, p) => sum + Number(p.amount), 0);
+  const mainCurrency = payments.length > 0 ? payments[0].currency : "IDR";
 
   return (
     <DashboardLayout requireRole="admin">
@@ -114,8 +157,8 @@ export default function DashboardPayments() {
                 <Select value={form.currency} onValueChange={(v) => setForm({ ...form, currency: v })}>
                   <SelectTrigger className="bg-secondary border-border"><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="USD">USD</SelectItem>
                     <SelectItem value="IDR">IDR</SelectItem>
+                    <SelectItem value="USD">USD</SelectItem>
                     <SelectItem value="EUR">EUR</SelectItem>
                     <SelectItem value="GBP">GBP</SelectItem>
                   </SelectContent>
@@ -137,12 +180,6 @@ export default function DashboardPayments() {
                 placeholder="Description"
                 value={form.description}
                 onChange={(e) => setForm({ ...form, description: e.target.value })}
-                className="bg-secondary border-border"
-              />
-              <Input
-                placeholder="RevenueCat ID (optional)"
-                value={form.revenuecat_id}
-                onChange={(e) => setForm({ ...form, revenuecat_id: e.target.value })}
                 className="bg-secondary border-border"
               />
               <Select value={form.status} onValueChange={(v) => setForm({ ...form, status: v })}>
@@ -167,7 +204,7 @@ export default function DashboardPayments() {
             <TrendingUp className="h-8 w-8 text-primary" />
             <div>
               <p className="text-xs text-muted-foreground">Total Revenue</p>
-              <p className="text-xl font-bold">${totalRevenue.toLocaleString()}</p>
+              <p className="text-xl font-bold">{formatAmount(totalRevenue, mainCurrency)}</p>
             </div>
           </CardContent>
         </Card>
@@ -176,7 +213,7 @@ export default function DashboardPayments() {
             <Clock className="h-8 w-8 text-amber-400" />
             <div>
               <p className="text-xs text-muted-foreground">Pending</p>
-              <p className="text-xl font-bold">${pendingAmount.toLocaleString()}</p>
+              <p className="text-xl font-bold">{formatAmount(pendingAmount, mainCurrency)}</p>
             </div>
           </CardContent>
         </Card>
@@ -196,34 +233,63 @@ export default function DashboardPayments() {
         {payments.length === 0 && <p className="text-muted-foreground text-center py-8">No payments recorded yet.</p>}
         {payments.map((p) => (
           <Card key={p.id} className="glass-card">
-            <CardContent className="py-4 px-6 flex items-center justify-between">
-              <div>
-                <p className="font-semibold">${Number(p.amount).toFixed(2)} {p.currency}</p>
-                <p className="text-sm text-muted-foreground">
+            <CardContent className="py-4 px-6 flex items-center justify-between flex-wrap gap-3">
+              <div className="min-w-0 flex-1">
+                <p className="font-semibold">{formatAmount(p.amount, p.currency)} {p.currency}</p>
+                <p className="text-sm text-muted-foreground truncate">
                   {p.clients?.name ?? "No client"} · {p.projects?.title ?? "No project"}
                   {p.description && ` · ${p.description}`}
                 </p>
                 <p className="text-xs text-muted-foreground mt-0.5">
                   {new Date(p.created_at).toLocaleDateString()}
-                  {p.revenuecat_id && ` · RC: ${p.revenuecat_id}`}
                 </p>
               </div>
-              <Select value={p.status} onValueChange={(v) => handleStatusChange(p.id, v)}>
-                <SelectTrigger className={`w-[110px] border-0 text-xs font-medium ${
-                  p.status === "paid" ? "bg-primary/20 text-primary" :
-                  p.status === "overdue" ? "bg-destructive/20 text-destructive" :
-                  p.status === "refunded" ? "bg-muted text-muted-foreground" :
-                  "bg-amber-500/20 text-amber-400"
-                }`}>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="pending">Pending</SelectItem>
-                  <SelectItem value="paid">Paid</SelectItem>
-                  <SelectItem value="overdue">Overdue</SelectItem>
-                  <SelectItem value="refunded">Refunded</SelectItem>
-                </SelectContent>
-              </Select>
+              <div className="flex items-center gap-2">
+                {/* Send Invoice via Xendit */}
+                {p.status === "pending" && !p.xendit_invoice_url && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="border-primary/30 text-primary hover:bg-primary/10"
+                    onClick={() => handleSendInvoice(p)}
+                    disabled={sendingInvoice === p.id}
+                  >
+                    {sendingInvoice === p.id ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <><Send className="h-3.5 w-3.5 mr-1" /> Invoice</>
+                    )}
+                  </Button>
+                )}
+                {/* Open existing invoice link */}
+                {p.xendit_invoice_url && p.status !== "paid" && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="border-primary/30 text-primary hover:bg-primary/10"
+                    onClick={() => window.open(p.xendit_invoice_url!, "_blank")}
+                  >
+                    <ExternalLink className="h-3.5 w-3.5 mr-1" /> Link
+                  </Button>
+                )}
+                {/* Status selector */}
+                <Select value={p.status} onValueChange={(v) => handleStatusChange(p.id, v)}>
+                  <SelectTrigger className={`w-[110px] border-0 text-xs font-medium ${
+                    p.status === "paid" ? "bg-primary/20 text-primary" :
+                    p.status === "overdue" ? "bg-destructive/20 text-destructive" :
+                    p.status === "refunded" ? "bg-muted text-muted-foreground" :
+                    "bg-amber-500/20 text-amber-400"
+                  }`}>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="pending">Pending</SelectItem>
+                    <SelectItem value="paid">Paid</SelectItem>
+                    <SelectItem value="overdue">Overdue</SelectItem>
+                    <SelectItem value="refunded">Refunded</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </CardContent>
           </Card>
         ))}
